@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Humanizador de Textos</title>
+    <title>Humanizador de Textos - Anti Detector IA</title>
     <style>
         :root {
             --primary-color: #4a6fa5;
@@ -258,47 +258,81 @@
             font-size: 0.8rem;
             color: #888;
         }
+        
+        .ai-score {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #fff3cd;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .score-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .score-fill {
+            height: 100%;
+            background-color: #4caf50;
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+        
+        .human-percentage {
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>Humanizador de Textos</h1>
-            <p class="subtitle">Convierte textos técnicos o formales en un lenguaje más natural y humano</p>
+            <h1>Humanizador de Textos - Anti Detector IA</h1>
+            <p class="subtitle">Convierte textos de IA en escritura humana indetectable</p>
         </div>
     </header>
     
     <div class="container">
         <div class="main-content">
             <section class="input-section">
-                <h2>Texto Original</h2>
-                <textarea id="original-text" placeholder="Pega aquí tu texto (hasta 10,000 palabras)..."></textarea>
+                <h2>Texto Original (IA)</h2>
+                <textarea id="original-text" placeholder="Pega aquí tu texto generado por IA (hasta 10,000 palabras)..."></textarea>
                 <div class="word-count" id="word-count">Palabras: 0</div>
                 
                 <div class="advanced-options">
-                    <h3>Opciones de Humanización</h3>
+                    <h3>Técnicas Anti-Detección</h3>
                     <div class="option-group">
                         <label>
-                            <input type="checkbox" id="simplify-sentences" checked>
-                            Simplificar oraciones complejas
+                            <input type="checkbox" id="add-human-errors" checked>
+                            Añadir errores humanos leves
                         </label>
                     </div>
                     <div class="option-group">
                         <label>
-                            <input type="checkbox" id="replace-formal-words" checked>
-                            Reemplazar palabras formales
+                            <input type="checkbox" id="vary-sentence-structure" checked>
+                            Variar estructura de oraciones
                         </label>
                     </div>
                     <div class="option-group">
                         <label>
-                            <input type="checkbox" id="improve-readability" checked>
-                            Mejorar legibilidad
+                            <input type="checkbox" id="add-colloquialisms" checked>
+                            Añadir expresiones coloquiales
                         </label>
                     </div>
                     <div class="option-group">
                         <label>
-                            <input type="checkbox" id="add-conversational-tone">
-                            Añadir tono conversacional
+                            <input type="checkbox" id="break-patterns" checked>
+                            Romper patrones de IA
+                        </label>
+                    </div>
+                    <div class="option-group">
+                        <label>
+                            <input type="checkbox" id="add-personal-touch">
+                            Añadir toque personal
                         </label>
                     </div>
                 </div>
@@ -310,13 +344,21 @@
                 
                 <div class="processing-indicator" id="processing-indicator">
                     <div class="spinner"></div>
-                    <p>Procesando texto... Esto puede tomar unos segundos</p>
+                    <p>Aplicando técnicas anti-detección... Esto puede tomar unos segundos</p>
                 </div>
             </section>
             
             <section class="output-section">
                 <h2>Texto Humanizado</h2>
-                <textarea id="humanized-text" readonly placeholder="Aquí aparecerá tu texto humanizado..."></textarea>
+                <textarea id="humanized-text" readonly placeholder="Aquí aparecerá tu texto humanizado e indetectable..."></textarea>
+                
+                <div class="ai-score" id="ai-score" style="display: none;">
+                    <p>Probabilidad de detección como IA: <span class="human-percentage" id="ai-percentage">0%</span></p>
+                    <div class="score-bar">
+                        <div class="score-fill" id="score-fill" style="width: 0%"></div>
+                    </div>
+                    <p id="ai-assessment">El texto parece completamente humano</p>
+                </div>
                 
                 <div class="stats">
                     <div class="stat-item">
@@ -334,7 +376,7 @@
                 </div>
                 
                 <div class="quality-indicator" id="quality-indicator" style="display: none;">
-                    <p>✅ Tu texto ha sido humanizado exitosamente. La legibilidad ha mejorado significativamente.</p>
+                    <p>✅ Tu texto ha sido humanizado exitosamente. La probabilidad de detección como IA se ha reducido significativamente.</p>
                 </div>
                 
                 <div class="controls">
@@ -356,13 +398,13 @@
         </section>
         
         <div class="footer">
-            <p>Aplicación desarrollada con HTML, CSS y JavaScript</p>
+            <p>Aplicación desarrollada con HTML, CSS y JavaScript - Técnicas Anti-Detección IA</p>
             <p>© 2023 Humanizador de Textos - Todos los derechos reservados</p>
         </div>
     </div>
 
     <script>
-        // Clase para humanizar textos
+        // Clase para humanizar textos con técnicas anti-detección de IA
         class TextHumanizer {
             constructor() {
                 this.replacements = {
@@ -395,44 +437,102 @@
                     'resulta evidente': 'es claro',
                     'llevar a cabo': 'hacer',
                     'poner en marcha': 'iniciar',
-                    'tener en cuenta': 'considerar'
+                    'tener en cuenta': 'considerar',
+                    'en primer lugar': 'primero',
+                    'en segundo lugar': 'segundo',
+                    'por último': 'finalmente',
+                    'de acuerdo con': 'según',
+                    'con respecto a': 'sobre',
+                    'en cuanto a': 'respecto a',
+                    'así como también': 'y también',
+                    'de la misma manera': 'igual',
+                    'en otras palabras': 'es decir',
+                    'cabe destacar': 'es importante',
+                    'es importante señalar': 'hay que decir',
+                    'vale la pena mencionar': 'conviene mencionar'
                 };
                 
-                this.conversationalPhrases = [
-                    'Es importante mencionar que',
-                    'Vale la pena destacar que',
-                    'Como puedes ver',
-                    'Te cuento que',
-                    'Quiero que sepas que',
-                    'Es interesante notar que',
-                    'Debes considerar que',
-                    'Ten en cuenta que',
-                    'Como seguramente sabes',
-                    'Para que lo entiendas mejor'
+                this.colloquialExpressions = [
+                    'o sea',
+                    'digamos',
+                    'bueno',
+                    'pues',
+                    'vamos',
+                    'fíjate',
+                    'mira',
+                    'oye',
+                    'claro',
+                    'desde luego',
+                    'por supuesto',
+                    'la verdad',
+                    'a ver',
+                    'entonces',
+                    'total',
+                    'en fin',
+                    'así que',
+                    'pues eso',
+                    'ya sabes',
+                    'como te decía'
+                ];
+                
+                this.humanErrors = [
+                    { from: 'haber', to: 'a ver' },
+                    { from: 'halla', to: 'haya' },
+                    { from: 'aya', to: 'haya' },
+                    { from: 'echo', to: 'hecho' },
+                    { from: 'haiga', to: 'haya' },
+                    { from: 'iba', to: 'iva' },
+                    { from: 'valla', to: 'vaya' },
+                    { from: 'raya', to: 'ralla' },
+                    { from: 'hechar', to: 'echar' },
+                    { from: 'cabo', to: 'caso' }
+                ];
+                
+                this.personalExpressions = [
+                    'En mi opinión',
+                    'Desde mi punto de vista',
+                    'Personalmente creo que',
+                    'Me parece que',
+                    'A mi entender',
+                    'En mi experiencia',
+                    'Si me preguntas a mí',
+                    'Yo diría que',
+                    'A mi modo de ver',
+                    'Desde mi perspectiva'
                 ];
             }
             
             humanizeText(text, options = {}) {
                 let humanizedText = text;
                 
-                // Aplicar reemplazos de palabras formales
-                if (options.replaceFormalWords) {
+                // Reemplazar palabras formales por informales
+                if (options.replaceFormalWords !== false) {
                     humanizedText = this.replaceFormalWords(humanizedText);
                 }
                 
-                // Simplificar estructura de oraciones
-                if (options.simplifySentences) {
-                    humanizedText = this.simplifySentences(humanizedText);
+                // Variar estructura de oraciones
+                if (options.varySentenceStructure) {
+                    humanizedText = this.varySentenceStructure(humanizedText);
                 }
                 
-                // Añadir tono conversacional
-                if (options.addConversationalTone) {
-                    humanizedText = this.addConversationalTone(humanizedText);
+                // Añadir expresiones coloquiales
+                if (options.addColloquialisms) {
+                    humanizedText = this.addColloquialisms(humanizedText);
                 }
                 
-                // Mejorar legibilidad
-                if (options.improveReadability) {
-                    humanizedText = this.improveReadability(humanizedText);
+                // Romper patrones de IA
+                if (options.breakPatterns) {
+                    humanizedText = this.breakPatterns(humanizedText);
+                }
+                
+                // Añadir toque personal
+                if (options.addPersonalTouch) {
+                    humanizedText = this.addPersonalTouch(humanizedText);
+                }
+                
+                // Añadir errores humanos leves (opcional)
+                if (options.addHumanErrors) {
+                    humanizedText = this.addHumanErrors(humanizedText);
                 }
                 
                 return humanizedText;
@@ -449,59 +549,152 @@
                 return result;
             }
             
-            simplifySentences(text) {
-                // Dividir en oraciones
+            varySentenceStructure(text) {
                 const sentences = text.split(/(?<=[.!?])\s+/);
-                const simplifiedSentences = [];
+                const variedSentences = [];
                 
-                for (let sentence of sentences) {
-                    // Eliminar redundancias
-                    sentence = sentence.replace(/\b(\w+)\s+\1\b/gi, '$1');
+                for (let i = 0; i < sentences.length; i++) {
+                    let sentence = sentences[i];
                     
-                    // Reemplazar construcciones pasivas por activas
-                    sentence = sentence.replace(/es realizado por/gi, 'hace');
-                    sentence = sentence.replace(/es llevado a cabo por/gi, 'realiza');
-                    sentence = sentence.replace(/es utilizado por/gi, 'usa');
-                    sentence = sentence.replace(/fue desarrollado por/gi, 'desarrolló');
-                    sentence = sentence.replace(/será implementado por/gi, 'implementará');
+                    // Cada 3-4 oraciones, cambiar la estructura
+                    if (i % 4 === 0 && sentence.length > 20) {
+                        // Convertir algunas oraciones en preguntas retóricas
+                        if (i % 8 === 0) {
+                            sentence = this.convertToRhetoricalQuestion(sentence);
+                        }
+                        // Dividir oraciones largas
+                        else if (sentence.split(' ').length > 25) {
+                            const parts = this.splitLongSentence(sentence);
+                            variedSentences.push(parts[0]);
+                            if (parts[1]) variedSentences.push(parts[1]);
+                            continue;
+                        }
+                        // Combinar oraciones cortas
+                        else if (i > 0 && sentences[i-1].split(' ').length < 8 && 
+                                 sentence.split(' ').length < 10) {
+                            sentence = sentences[i-1] + ' y ' + sentence.toLowerCase();
+                            variedSentences.pop(); // Eliminar la oración anterior
+                        }
+                    }
                     
-                    // Acortar oraciones muy largas
-                    const words = sentence.split(' ');
-                    if (words.length > 25) {
-                        // Dividir oraciones muy largas en dos
-                        const midPoint = Math.floor(words.length / 2);
-                        const firstPart = words.slice(0, midPoint).join(' ');
-                        const secondPart = words.slice(midPoint).join(' ');
-                        simplifiedSentences.push(firstPart + '.');
-                        simplifiedSentences.push(this.capitalizeFirstLetter(secondPart));
-                    } else {
-                        simplifiedSentences.push(sentence);
+                    variedSentences.push(sentence);
+                }
+                
+                return variedSentences.join(' ');
+            }
+            
+            convertToRhetoricalQuestion(sentence) {
+                // Convertir una oración afirmativa en pregunta retórica
+                if (sentence.endsWith('.')) {
+                    sentence = sentence.slice(0, -1);
+                    
+                    const questionPhrases = [
+                        '¿No crees?',
+                        '¿Verdad?',
+                        '¿No te parece?',
+                        '¿Qué opinas?',
+                        '¿No es así?'
+                    ];
+                    
+                    const randomPhrase = questionPhrases[Math.floor(Math.random() * questionPhrases.length)];
+                    return sentence + '. ' + randomPhrase;
+                }
+                
+                return sentence;
+            }
+            
+            splitLongSentence(sentence) {
+                const words = sentence.split(' ');
+                if (words.length <= 15) return [sentence];
+                
+                // Encontrar un punto natural para dividir (después de una coma o conjunción)
+                let splitIndex = Math.floor(words.length / 2);
+                for (let i = splitIndex; i < words.length - 3; i++) {
+                    if (words[i].endsWith(',') || 
+                        ['y', 'o', 'pero', 'aunque', 'sin embargo'].includes(words[i].toLowerCase())) {
+                        splitIndex = i + 1;
+                        break;
                     }
                 }
                 
-                return simplifiedSentences.join(' ');
+                const firstPart = words.slice(0, splitIndex).join(' ');
+                const secondPart = words.slice(splitIndex).join(' ');
+                
+                return [firstPart, this.capitalizeFirstLetter(secondPart)];
             }
             
-            addConversationalTone(text) {
+            addColloquialisms(text) {
                 const sentences = text.split(/(?<=[.!?])\s+/);
                 
-                // Añadir frases conversacionales cada 3-4 oraciones
-                for (let i = 3; i < sentences.length; i += 4) {
-                    const randomPhrase = this.conversationalPhrases[
-                        Math.floor(Math.random() * this.conversationalPhrases.length)
+                // Añadir expresiones coloquiales cada 5-7 oraciones
+                for (let i = 5; i < sentences.length; i += Math.floor(Math.random() * 3) + 5) {
+                    const randomExpression = this.colloquialExpressions[
+                        Math.floor(Math.random() * this.colloquialExpressions.length)
                     ];
-                    sentences[i] = randomPhrase + ', ' + sentences[i].toLowerCase();
+                    
+                    // Añadir al inicio o final de la oración
+                    if (Math.random() > 0.5) {
+                        sentences[i] = randomExpression + ', ' + sentences[i].toLowerCase();
+                    } else {
+                        sentences[i] = sentences[i] + ', ' + randomExpression + '.';
+                    }
                 }
                 
                 return sentences.join(' ');
             }
             
-            improveReadability(text) {
-                // Reemplazar comas por puntos en lugares estratégicos para acortar oraciones
-                let result = text.replace(/, sin embargo,/gi, '. Sin embargo,');
-                result = result.replace(/, no obstante,/gi, '. No obstante,');
-                result = result.replace(/, además,/gi, '. Además,');
-                result = result.replace(/, por lo tanto,/gi, '. Por lo tanto,');
+            breakPatterns(text) {
+                // Romper patrones repetitivos típicos de IA
+                let result = text;
+                
+                // Variar conectores
+                result = result.replace(/Además, /g, () => 
+                    Math.random() > 0.5 ? 'Por otro lado, ' : 'También, ');
+                
+                result = result.replace(/Sin embargo, /g, () => 
+                    Math.random() > 0.5 ? 'No obstante, ' : 'En cambio, ');
+                
+                result = result.replace(/Por lo tanto, /g, () => 
+                    Math.random() > 0.5 ? 'Así que, ' : 'Por eso, ');
+                
+                // Variar inicios de párrafo
+                result = result.replace(/En primer lugar, /g, 'Para empezar, ');
+                result = result.replace(/En segundo lugar, /g, 'Después, ');
+                result = result.replace(/En conclusión, /g, 'En resumen, ');
+                
+                return result;
+            }
+            
+            addPersonalTouch(text) {
+                const sentences = text.split(/(?<=[.!?])\s+/);
+                
+                // Añadir expresiones personales cada 6-8 oraciones
+                for (let i = 6; i < sentences.length; i += Math.floor(Math.random() * 3) + 6) {
+                    const randomExpression = this.personalExpressions[
+                        Math.floor(Math.random() * this.personalExpressions.length)
+                    ];
+                    
+                    sentences[i] = randomExpression + ', ' + sentences[i].toLowerCase();
+                }
+                
+                return sentences.join(' ');
+            }
+            
+            addHumanErrors(text) {
+                let result = text;
+                
+                // Añadir algunos errores humanos comunes (ligeros)
+                const errorCount = Math.max(1, Math.floor(text.length / 2000)); // ~1 error cada 2000 caracteres
+                
+                for (let i = 0; i < errorCount; i++) {
+                    const error = this.humanErrors[Math.floor(Math.random() * this.humanErrors.length)];
+                    const regex = new RegExp(`\\b${error.from}\\b`, 'gi');
+                    
+                    // Solo reemplazar si encontramos la palabra y con una probabilidad del 50%
+                    if (result.match(regex) && Math.random() > 0.5) {
+                        result = result.replace(regex, error.to);
+                    }
+                }
                 
                 return result;
             }
@@ -523,6 +716,60 @@
                 readability = Math.max(0, Math.min(100, readability));
                 
                 return Math.round(readability);
+            }
+            
+            estimateAIDetection(text) {
+                // Estimación basada en patrones típicos de texto de IA
+                let aiScore = 0;
+                
+                // Patrones que aumentan la probabilidad de detección
+                const aiPatterns = [
+                    { pattern: /En primer lugar|En segundo lugar|En tercer lugar/g, weight: 3 },
+                    { pattern: /Además|Por otra parte|Asimismo/g, weight: 2 },
+                    { pattern: /Sin embargo|No obstante|Por el contrario/g, weight: 2 },
+                    { pattern: /En conclusión|En resumen|Finalmente/g, weight: 3 },
+                    { pattern: /Es importante destacar|Cabe mencionar|Vale la pena señalar/g, weight: 2 },
+                    { pattern: /Por un lado|Por otro lado/g, weight: 2 },
+                    { pattern: /De esta manera|De este modo/g, weight: 2 },
+                    { pattern: /En cuanto a|Respecto a|En relación con/g, weight: 2 }
+                ];
+                
+                // Calcular puntuación basada en patrones
+                for (const { pattern, weight } of aiPatterns) {
+                    const matches = text.match(pattern);
+                    if (matches) {
+                        aiScore += matches.length * weight;
+                    }
+                }
+                
+                // Considerar longitud promedio de oraciones (las IA tienden a oraciones más largas)
+                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                const avgSentenceLength = text.split(/\s+/).length / sentences.length;
+                
+                if (avgSentenceLength > 20) aiScore += 5;
+                if (avgSentenceLength > 25) aiScore += 5;
+                
+                // Considerar uniformidad en la estructura
+                const sentenceLengths = sentences.map(s => s.split(/\s+/).length);
+                const lengthVariance = this.calculateVariance(sentenceLengths);
+                
+                // Menor variación = más probable que sea IA
+                if (lengthVariance < 50) aiScore += 5;
+                
+                // Normalizar puntuación (0-100)
+                const normalizedScore = Math.min(100, Math.max(0, aiScore));
+                
+                return 100 - normalizedScore; // Devolvemos el porcentaje de "humanidad"
+            }
+            
+            calculateVariance(numbers) {
+                if (numbers.length === 0) return 0;
+                
+                const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+                const squaredDiffs = numbers.map(num => Math.pow(num - mean, 2));
+                const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / numbers.length;
+                
+                return variance;
             }
             
             capitalizeFirstLetter(string) {
@@ -547,12 +794,17 @@
             const qualityIndicator = document.getElementById('quality-indicator');
             const historyList = document.getElementById('history-list');
             const clearHistoryBtn = document.getElementById('clear-history-btn');
+            const aiScoreElement = document.getElementById('ai-score');
+            const aiPercentage = document.getElementById('ai-percentage');
+            const scoreFill = document.getElementById('score-fill');
+            const aiAssessment = document.getElementById('ai-assessment');
             
             // Opciones de humanización
-            const simplifySentences = document.getElementById('simplify-sentences');
-            const replaceFormalWords = document.getElementById('replace-formal-words');
-            const improveReadability = document.getElementById('improve-readability');
-            const addConversationalTone = document.getElementById('add-conversational-tone');
+            const addHumanErrors = document.getElementById('add-human-errors');
+            const varySentenceStructure = document.getElementById('vary-sentence-structure');
+            const addColloquialisms = document.getElementById('add-colloquialisms');
+            const breakPatterns = document.getElementById('break-patterns');
+            const addPersonalTouch = document.getElementById('add-personal-touch');
             
             // Cargar historial desde localStorage
             loadHistory();
@@ -578,6 +830,7 @@
                 humanizedText.value = '';
                 wordCount.textContent = 'Palabras: 0';
                 qualityIndicator.style.display = 'none';
+                aiScoreElement.style.display = 'none';
                 originalWords.textContent = '0';
                 humanizedWords.textContent = '0';
                 readabilityScore.textContent = '0';
@@ -606,10 +859,11 @@
                     try {
                         // Obtener opciones seleccionadas
                         const options = {
-                            simplifySentences: simplifySentences.checked,
-                            replaceFormalWords: replaceFormalWords.checked,
-                            improveReadability: improveReadability.checked,
-                            addConversationalTone: addConversationalTone.checked
+                            addHumanErrors: addHumanErrors.checked,
+                            varySentenceStructure: varySentenceStructure.checked,
+                            addColloquialisms: addColloquialisms.checked,
+                            breakPatterns: breakPatterns.checked,
+                            addPersonalTouch: addPersonalTouch.checked
                         };
                         
                         // Humanizar texto
@@ -619,6 +873,7 @@
                         const originalWordCount = text.split(/\s+/).length;
                         const humanizedWordCount = humanized.split(/\s+/).length;
                         const readability = humanizer.calculateReadability(humanized);
+                        const aiDetectionScore = humanizer.estimateAIDetection(humanized);
                         
                         // Mostrar resultado
                         humanizedText.value = humanized;
@@ -626,9 +881,29 @@
                         humanizedWords.textContent = humanizedWordCount;
                         readabilityScore.textContent = readability;
                         qualityIndicator.style.display = 'block';
+                        aiScoreElement.style.display = 'block';
+                        
+                        // Actualizar indicador de detección de IA
+                        aiPercentage.textContent = `${100 - aiDetectionScore}%`;
+                        scoreFill.style.width = `${100 - aiDetectionScore}%`;
+                        
+                        // Cambiar color según el nivel de detección
+                        if (aiDetectionScore >= 80) {
+                            scoreFill.style.backgroundColor = '#4caf50';
+                            aiAssessment.textContent = 'El texto parece completamente humano';
+                        } else if (aiDetectionScore >= 60) {
+                            scoreFill.style.backgroundColor = '#8bc34a';
+                            aiAssessment.textContent = 'Baja probabilidad de detección como IA';
+                        } else if (aiDetectionScore >= 40) {
+                            scoreFill.style.backgroundColor = '#ffc107';
+                            aiAssessment.textContent = 'Probabilidad moderada de detección como IA';
+                        } else {
+                            scoreFill.style.backgroundColor = '#f44336';
+                            aiAssessment.textContent = 'Alta probabilidad de detección como IA';
+                        }
                         
                         // Guardar en historial
-                        saveToHistory(text, humanized, originalWordCount, humanizedWordCount, readability);
+                        saveToHistory(text, humanized, originalWordCount, humanizedWordCount, readability, aiDetectionScore);
                         
                     } catch (error) {
                         console.error('Error:', error);
@@ -686,7 +961,7 @@
             });
             
             // Funciones para manejar el historial
-            function saveToHistory(original, humanized, originalCount, humanizedCount, readability) {
+            function saveToHistory(original, humanized, originalCount, humanizedCount, readability, aiScore) {
                 const history = getHistory();
                 const newItem = {
                     id: Date.now(),
@@ -695,7 +970,8 @@
                     humanized: humanized,
                     originalCount: originalCount,
                     humanizedCount: humanizedCount,
-                    readability: readability
+                    readability: readability,
+                    aiScore: aiScore
                 };
                 
                 history.unshift(newItem);
@@ -728,7 +1004,7 @@
                     historyItem.className = 'history-item';
                     historyItem.innerHTML = `
                         <div><strong>${item.original.substring(0, 50)}${item.original.length > 50 ? '...' : ''}</strong></div>
-                        <div class="history-date">${item.date} - Legibilidad: ${item.readability}</div>
+                        <div class="history-date">${item.date} - Legibilidad: ${item.readability} - IA: ${100 - item.aiScore}%</div>
                     `;
                     
                     historyItem.addEventListener('click', function() {
@@ -738,6 +1014,25 @@
                         humanizedWords.textContent = item.humanizedCount;
                         readabilityScore.textContent = item.readability;
                         qualityIndicator.style.display = 'block';
+                        aiScoreElement.style.display = 'block';
+                        
+                        // Actualizar indicador de IA
+                        aiPercentage.textContent = `${100 - item.aiScore}%`;
+                        scoreFill.style.width = `${100 - item.aiScore}%`;
+                        
+                        if (item.aiScore >= 80) {
+                            scoreFill.style.backgroundColor = '#4caf50';
+                            aiAssessment.textContent = 'El texto parece completamente humano';
+                        } else if (item.aiScore >= 60) {
+                            scoreFill.style.backgroundColor = '#8bc34a';
+                            aiAssessment.textContent = 'Baja probabilidad de detección como IA';
+                        } else if (item.aiScore >= 40) {
+                            scoreFill.style.backgroundColor = '#ffc107';
+                            aiAssessment.textContent = 'Probabilidad moderada de detección como IA';
+                        } else {
+                            scoreFill.style.backgroundColor = '#f44336';
+                            aiAssessment.textContent = 'Alta probabilidad de detección como IA';
+                        }
                         
                         // Actualizar contador de palabras
                         const words = item.original ? item.original.split(/\s+/).length : 0;
