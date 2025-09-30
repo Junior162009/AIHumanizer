@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Humanizador de Textos</title>
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4cb5ae;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #f5f7fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .input-section, .output-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        h2 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-color);
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 16px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+        
+        .word-count {
+            text-align: right;
+            margin-top: 10px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+        
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: var(--dark-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #dee2e6;
+        }
+        
+        .processing-indicator {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--accent-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .quality-indicator {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f5e9;
+            border-radius: 5px;
+            border-left: 4px solid #4caf50;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .advanced-options {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f8ff;
+            border-radius: 5px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .option-group {
+            margin-bottom: 10px;
+        }
+        
+        .option-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .option-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .history-section {
+            margin-top: 30px;
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .history-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 15px;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        .history-item {
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .history-item:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-date {
+            font-size: 0.8rem;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Humanizador de Textos</h1>
+            <p class="subtitle">Convierte textos técnicos o formales en un lenguaje más natural y humano</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="main-content">
+            <section class="input-section">
+                <h2>Texto Original</h2>
+                <textarea id="original-text" placeholder="Pega aquí tu texto (hasta 10,000 palabras)..."></textarea>
+                <div class="word-count" id="word-count">Palabras: 0</div>
+                
+                <div class="advanced-options">
+                    <h3>Opciones de Humanización</h3>
+                    <div class="option-group">
+                        <label>
+                            <input type="checkbox" id="simplify-sentences" checked>
+                            Simplificar oraciones complejas
+                        </label>
+                    </div>
+                    <div class="option-group">
+                        <label>
+                            <input type="checkbox" id="replace-formal-words" checked>
+                            Reemplazar palabras formales
+                        </label>
+                    </div>
+                    <div class="option-group">
+                        <label>
+                            <input type="checkbox" id="improve-readability" checked>
+                            Mejorar legibilidad
+                        </label>
+                    </div>
+                    <div class="option-group">
+                        <label>
+                            <input type="checkbox" id="add-conversational-tone">
+                            Añadir tono conversacional
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn-secondary" id="clear-btn">Limpiar</button>
+                    <button class="btn-primary" id="humanize-btn">Humanizar Texto</button>
+                </div>
+                
+                <div class="processing-indicator" id="processing-indicator">
+                    <div class="spinner"></div>
+                    <p>Procesando texto... Esto puede tomar unos segundos</p>
+                </div>
+            </section>
+            
+            <section class="output-section">
+                <h2>Texto Humanizado</h2>
+                <textarea id="humanized-text" readonly placeholder="Aquí aparecerá tu texto humanizado..."></textarea>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="original-words">0</div>
+                        <div class="stat-label">Palabras originales</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="humanized-words">0</div>
+                        <div class="stat-label">Palabras humanizadas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="readability-score">0</div>
+                        <div class="stat-label">Legibilidad</div>
+                    </div>
+                </div>
+                
+                <div class="quality-indicator" id="quality-indicator" style="display: none;">
+                    <p>✅ Tu texto ha sido humanizado exitosamente. La legibilidad ha mejorado significativamente.</p>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn-secondary" id="copy-btn">Copiar Texto</button>
+                    <button class="btn-secondary" id="download-btn">Descargar</button>
+                </div>
+            </section>
+        </div>
+        
+        <section class="history-section">
+            <h2>Historial de Textos</h2>
+            <p>Haz clic en cualquier elemento del historial para cargarlo de nuevo</p>
+            <div class="history-list" id="history-list">
+                <!-- El historial se cargará aquí dinámicamente -->
+            </div>
+            <div class="controls">
+                <button class="btn-secondary" id="clear-history-btn">Limpiar Historial</button>
+            </div>
+        </section>
+        
+        <div class="footer">
+            <p>Aplicación desarrollada con HTML, CSS y JavaScript</p>
+            <p>© 2023 Humanizador de Textos - Todos los derechos reservados</p>
+        </div>
+    </div>
+
+    <script>
+        // Clase para humanizar textos
+        class TextHumanizer {
+            constructor() {
+                this.replacements = {
+                    'utilizar': 'usar',
+                    'finalizar': 'terminar',
+                    'iniciar': 'empezar',
+                    'poseer': 'tener',
+                    'visualizar': 'ver',
+                    'efectuar': 'hacer',
+                    'facilitar': 'ayudar',
+                    'obtener': 'conseguir',
+                    'proporcionar': 'dar',
+                    'requerir': 'necesitar',
+                    'adicionalmente': 'además',
+                    'consecuentemente': 'por lo tanto',
+                    'no obstante': 'sin embargo',
+                    'en cuanto a': 'sobre',
+                    'debido a que': 'porque',
+                    'a fin de que': 'para que',
+                    'con el propósito de': 'para',
+                    'en relación con': 'sobre',
+                    'por medio de': 'mediante',
+                    'en caso de que': 'si',
+                    'a pesar de que': 'aunque',
+                    'en virtud de': 'gracias a',
+                    'con anterioridad': 'antes',
+                    'posteriormente': 'después',
+                    'en definitiva': 'en resumen',
+                    'es preciso': 'hay que',
+                    'resulta evidente': 'es claro',
+                    'llevar a cabo': 'hacer',
+                    'poner en marcha': 'iniciar',
+                    'tener en cuenta': 'considerar'
+                };
+                
+                this.conversationalPhrases = [
+                    'Es importante mencionar que',
+                    'Vale la pena destacar que',
+                    'Como puedes ver',
+                    'Te cuento que',
+                    'Quiero que sepas que',
+                    'Es interesante notar que',
+                    'Debes considerar que',
+                    'Ten en cuenta que',
+                    'Como seguramente sabes',
+                    'Para que lo entiendas mejor'
+                ];
+            }
+            
+            humanizeText(text, options = {}) {
+                let humanizedText = text;
+                
+                // Aplicar reemplazos de palabras formales
+                if (options.replaceFormalWords) {
+                    humanizedText = this.replaceFormalWords(humanizedText);
+                }
+                
+                // Simplificar estructura de oraciones
+                if (options.simplifySentences) {
+                    humanizedText = this.simplifySentences(humanizedText);
+                }
+                
+                // Añadir tono conversacional
+                if (options.addConversationalTone) {
+                    humanizedText = this.addConversationalTone(humanizedText);
+                }
+                
+                // Mejorar legibilidad
+                if (options.improveReadability) {
+                    humanizedText = this.improveReadability(humanizedText);
+                }
+                
+                return humanizedText;
+            }
+            
+            replaceFormalWords(text) {
+                let result = text;
+                
+                for (const [formal, informal] of Object.entries(this.replacements)) {
+                    const regex = new RegExp(`\\b${formal}\\b`, 'gi');
+                    result = result.replace(regex, informal);
+                }
+                
+                return result;
+            }
+            
+            simplifySentences(text) {
+                // Dividir en oraciones
+                const sentences = text.split(/(?<=[.!?])\s+/);
+                const simplifiedSentences = [];
+                
+                for (let sentence of sentences) {
+                    // Eliminar redundancias
+                    sentence = sentence.replace(/\b(\w+)\s+\1\b/gi, '$1');
+                    
+                    // Reemplazar construcciones pasivas por activas
+                    sentence = sentence.replace(/es realizado por/gi, 'hace');
+                    sentence = sentence.replace(/es llevado a cabo por/gi, 'realiza');
+                    sentence = sentence.replace(/es utilizado por/gi, 'usa');
+                    sentence = sentence.replace(/fue desarrollado por/gi, 'desarrolló');
+                    sentence = sentence.replace(/será implementado por/gi, 'implementará');
+                    
+                    // Acortar oraciones muy largas
+                    const words = sentence.split(' ');
+                    if (words.length > 25) {
+                        // Dividir oraciones muy largas en dos
+                        const midPoint = Math.floor(words.length / 2);
+                        const firstPart = words.slice(0, midPoint).join(' ');
+                        const secondPart = words.slice(midPoint).join(' ');
+                        simplifiedSentences.push(firstPart + '.');
+                        simplifiedSentences.push(this.capitalizeFirstLetter(secondPart));
+                    } else {
+                        simplifiedSentences.push(sentence);
+                    }
+                }
+                
+                return simplifiedSentences.join(' ');
+            }
+            
+            addConversationalTone(text) {
+                const sentences = text.split(/(?<=[.!?])\s+/);
+                
+                // Añadir frases conversacionales cada 3-4 oraciones
+                for (let i = 3; i < sentences.length; i += 4) {
+                    const randomPhrase = this.conversationalPhrases[
+                        Math.floor(Math.random() * this.conversationalPhrases.length)
+                    ];
+                    sentences[i] = randomPhrase + ', ' + sentences[i].toLowerCase();
+                }
+                
+                return sentences.join(' ');
+            }
+            
+            improveReadability(text) {
+                // Reemplazar comas por puntos en lugares estratégicos para acortar oraciones
+                let result = text.replace(/, sin embargo,/gi, '. Sin embargo,');
+                result = result.replace(/, no obstante,/gi, '. No obstante,');
+                result = result.replace(/, además,/gi, '. Además,');
+                result = result.replace(/, por lo tanto,/gi, '. Por lo tanto,');
+                
+                return result;
+            }
+            
+            calculateReadability(text) {
+                // Fórmula simplificada de legibilidad
+                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                const words = text.split(/\s+/).filter(w => w.length > 0);
+                
+                if (sentences.length === 0 || words.length === 0) {
+                    return 0;
+                }
+                
+                const avgSentenceLength = words.length / sentences.length;
+                const avgWordLength = words.reduce((sum, word) => sum + word.length, 0) / words.length;
+                
+                // Fórmula simplificada basada en longitud de oraciones y palabras
+                let readability = 100 - (avgSentenceLength * 1.5 + avgWordLength * 10);
+                readability = Math.max(0, Math.min(100, readability));
+                
+                return Math.round(readability);
+            }
+            
+            capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+        }
+
+        // Inicialización cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            const humanizer = new TextHumanizer();
+            const originalText = document.getElementById('original-text');
+            const humanizedText = document.getElementById('humanized-text');
+            const wordCount = document.getElementById('word-count');
+            const humanizeBtn = document.getElementById('humanize-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const processingIndicator = document.getElementById('processing-indicator');
+            const originalWords = document.getElementById('original-words');
+            const humanizedWords = document.getElementById('humanized-words');
+            const readabilityScore = document.getElementById('readability-score');
+            const qualityIndicator = document.getElementById('quality-indicator');
+            const historyList = document.getElementById('history-list');
+            const clearHistoryBtn = document.getElementById('clear-history-btn');
+            
+            // Opciones de humanización
+            const simplifySentences = document.getElementById('simplify-sentences');
+            const replaceFormalWords = document.getElementById('replace-formal-words');
+            const improveReadability = document.getElementById('improve-readability');
+            const addConversationalTone = document.getElementById('add-conversational-tone');
+            
+            // Cargar historial desde localStorage
+            loadHistory();
+            
+            // Actualizar contador de palabras
+            originalText.addEventListener('input', function() {
+                const text = originalText.value.trim();
+                const words = text ? text.split(/\s+/).length : 0;
+                wordCount.textContent = `Palabras: ${words}`;
+                
+                // Deshabilitar botón si hay más de 10,000 palabras
+                if (words > 10000) {
+                    humanizeBtn.disabled = true;
+                    wordCount.innerHTML = `Palabras: <span style="color:red">${words} (Límite: 10,000)</span>`;
+                } else {
+                    humanizeBtn.disabled = false;
+                }
+            });
+            
+            // Limpiar texto
+            clearBtn.addEventListener('click', function() {
+                originalText.value = '';
+                humanizedText.value = '';
+                wordCount.textContent = 'Palabras: 0';
+                qualityIndicator.style.display = 'none';
+                originalWords.textContent = '0';
+                humanizedWords.textContent = '0';
+                readabilityScore.textContent = '0';
+            });
+            
+            // Humanizar texto
+            humanizeBtn.addEventListener('click', function() {
+                const text = originalText.value.trim();
+                if (!text) {
+                    alert('Por favor, ingresa un texto para humanizar.');
+                    return;
+                }
+                
+                const wordCount = text.split(/\s+/).length;
+                if (wordCount > 10000) {
+                    alert('El texto excede el límite de 10,000 palabras.');
+                    return;
+                }
+                
+                // Mostrar indicador de procesamiento
+                processingIndicator.style.display = 'block';
+                humanizeBtn.disabled = true;
+                
+                // Usar setTimeout para permitir que la UI se actualice
+                setTimeout(function() {
+                    try {
+                        // Obtener opciones seleccionadas
+                        const options = {
+                            simplifySentences: simplifySentences.checked,
+                            replaceFormalWords: replaceFormalWords.checked,
+                            improveReadability: improveReadability.checked,
+                            addConversationalTone: addConversationalTone.checked
+                        };
+                        
+                        // Humanizar texto
+                        const humanized = humanizer.humanizeText(text, options);
+                        
+                        // Calcular estadísticas
+                        const originalWordCount = text.split(/\s+/).length;
+                        const humanizedWordCount = humanized.split(/\s+/).length;
+                        const readability = humanizer.calculateReadability(humanized);
+                        
+                        // Mostrar resultado
+                        humanizedText.value = humanized;
+                        originalWords.textContent = originalWordCount;
+                        humanizedWords.textContent = humanizedWordCount;
+                        readabilityScore.textContent = readability;
+                        qualityIndicator.style.display = 'block';
+                        
+                        // Guardar en historial
+                        saveToHistory(text, humanized, originalWordCount, humanizedWordCount, readability);
+                        
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Error al procesar el texto. Por favor, intenta de nuevo.');
+                    } finally {
+                        // Ocultar indicador de procesamiento
+                        processingIndicator.style.display = 'none';
+                        humanizeBtn.disabled = false;
+                    }
+                }, 100);
+            });
+            
+            // Copiar texto humanizado
+            copyBtn.addEventListener('click', function() {
+                if (!humanizedText.value) {
+                    alert('No hay texto para copiar.');
+                    return;
+                }
+                
+                humanizedText.select();
+                document.execCommand('copy');
+                
+                // Feedback visual
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '¡Copiado!';
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                }, 2000);
+            });
+            
+            // Descargar texto humanizado
+            downloadBtn.addEventListener('click', function() {
+                if (!humanizedText.value) {
+                    alert('No hay texto para descargar.');
+                    return;
+                }
+                
+                const blob = new Blob([humanizedText.value], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'texto_humanizado.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            // Limpiar historial
+            clearHistoryBtn.addEventListener('click', function() {
+                if (confirm('¿Estás seguro de que quieres borrar todo el historial?')) {
+                    localStorage.removeItem('textHumanizerHistory');
+                    historyList.innerHTML = '<p>No hay elementos en el historial</p>';
+                }
+            });
+            
+            // Funciones para manejar el historial
+            function saveToHistory(original, humanized, originalCount, humanizedCount, readability) {
+                const history = getHistory();
+                const newItem = {
+                    id: Date.now(),
+                    date: new Date().toLocaleString(),
+                    original: original,
+                    humanized: humanized,
+                    originalCount: originalCount,
+                    humanizedCount: humanizedCount,
+                    readability: readability
+                };
+                
+                history.unshift(newItem);
+                
+                // Mantener solo los últimos 10 elementos
+                if (history.length > 10) {
+                    history.pop();
+                }
+                
+                localStorage.setItem('textHumanizerHistory', JSON.stringify(history));
+                loadHistory();
+            }
+            
+            function getHistory() {
+                const historyJSON = localStorage.getItem('textHumanizerHistory');
+                return historyJSON ? JSON.parse(historyJSON) : [];
+            }
+            
+            function loadHistory() {
+                const history = getHistory();
+                historyList.innerHTML = '';
+                
+                if (history.length === 0) {
+                    historyList.innerHTML = '<p>No hay elementos en el historial</p>';
+                    return;
+                }
+                
+                history.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    historyItem.innerHTML = `
+                        <div><strong>${item.original.substring(0, 50)}${item.original.length > 50 ? '...' : ''}</strong></div>
+                        <div class="history-date">${item.date} - Legibilidad: ${item.readability}</div>
+                    `;
+                    
+                    historyItem.addEventListener('click', function() {
+                        originalText.value = item.original;
+                        humanizedText.value = item.humanized;
+                        originalWords.textContent = item.originalCount;
+                        humanizedWords.textContent = item.humanizedCount;
+                        readabilityScore.textContent = item.readability;
+                        qualityIndicator.style.display = 'block';
+                        
+                        // Actualizar contador de palabras
+                        const words = item.original ? item.original.split(/\s+/).length : 0;
+                        wordCount.textContent = `Palabras: ${words}`;
+                    });
+                    
+                    historyList.appendChild(historyItem);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
