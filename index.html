@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Humanizador de Textos - Anti Detector IA</title>
+    <title>Humanizador y Detector de IA</title>
     <style>
         :root {
             --primary-color: #4a6fa5;
@@ -11,6 +11,9 @@
             --accent-color: #4cb5ae;
             --light-color: #f8f9fa;
             --dark-color: #343a40;
+            --danger-color: #e74c3c;
+            --warning-color: #f39c12;
+            --success-color: #2ecc71;
         }
         
         * {
@@ -51,11 +54,57 @@
             opacity: 0.9;
         }
         
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .tab {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+        }
+        
+        .tab.active {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        .tab:hover:not(.active) {
+            background: #e9ecef;
+        }
+        
+        .tab-icon {
+            font-size: 1.2rem;
+        }
+        
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 0 10px 10px 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-top: 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
         .main-content {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
-            margin-top: 30px;
+            margin-top: 20px;
         }
         
         @media (max-width: 768px) {
@@ -68,7 +117,7 @@
             background: white;
             border-radius: 10px;
             padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
         
         h2 {
@@ -286,119 +335,331 @@
             font-weight: bold;
             color: var(--secondary-color);
         }
+        
+        .detector-results {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .result-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .result-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .result-icon {
+            font-size: 1.5rem;
+        }
+        
+        .confidence-meter {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        
+        .confidence-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s;
+        }
+        
+        .analysis-details {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 500;
+        }
+        
+        .detail-value {
+            font-weight: 600;
+        }
+        
+        .human-score {
+            color: var(--success-color);
+        }
+        
+        .ai-score-high {
+            color: var(--danger-color);
+        }
+        
+        .ai-score-medium {
+            color: var(--warning-color);
+        }
+        
+        .ai-score-low {
+            color: var(--success-color);
+        }
     </style>
 </head>
 <body>
     <header>
         <div class="container">
-            <h1>Humanizador de Textos - Anti Detector IA</h1>
-            <p class="subtitle">Convierte textos de IA en escritura humana indetectable</p>
+            <h1>Humanizador y Detector de IA</h1>
+            <p class="subtitle">Convierte textos de IA en escritura humana o detecta contenido generado por IA</p>
         </div>
     </header>
     
     <div class="container">
-        <div class="main-content">
-            <section class="input-section">
-                <h2>Texto Original (IA)</h2>
-                <textarea id="original-text" placeholder="Pega aquí tu texto generado por IA (hasta 10,000 palabras)..."></textarea>
-                <div class="word-count" id="word-count">Palabras: 0</div>
+        <div class="tabs">
+            <div class="tab active" data-tab="humanizer">
+                <span class="tab-icon">✍️</span>
+                <span>Humanizador</span>
+            </div>
+            <div class="tab" data-tab="detector">
+                <span class="tab-icon">🔍</span>
+                <span>Detector de IA</span>
+            </div>
+        </div>
+        
+        <!-- Pestaña Humanizador -->
+        <div class="tab-content active" id="humanizer-tab">
+            <div class="main-content">
+                <section class="input-section">
+                    <h2>Texto Original (IA)</h2>
+                    <textarea id="original-text" placeholder="Pega aquí tu texto generado por IA (hasta 10,000 palabras)..."></textarea>
+                    <div class="word-count" id="word-count">Palabras: 0</div>
+                    
+                    <div class="advanced-options">
+                        <h3>Técnicas Anti-Detección</h3>
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="add-human-errors" checked>
+                                Añadir errores humanos leves
+                            </label>
+                        </div>
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="vary-sentence-structure" checked>
+                                Variar estructura de oraciones
+                            </label>
+                        </div>
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="add-colloquialisms" checked>
+                                Añadir expresiones coloquiales
+                            </label>
+                        </div>
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="break-patterns" checked>
+                                Romper patrones de IA
+                            </label>
+                        </div>
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="add-personal-touch">
+                                Añadir toque personal
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button class="btn-secondary" id="clear-btn">Limpiar</button>
+                        <button class="btn-primary" id="humanize-btn">Humanizar Texto</button>
+                    </div>
+                    
+                    <div class="processing-indicator" id="processing-indicator">
+                        <div class="spinner"></div>
+                        <p>Aplicando técnicas anti-detección... Esto puede tomar unos segundos</p>
+                    </div>
+                </section>
                 
-                <div class="advanced-options">
-                    <h3>Técnicas Anti-Detección</h3>
-                    <div class="option-group">
-                        <label>
-                            <input type="checkbox" id="add-human-errors" checked>
-                            Añadir errores humanos leves
-                        </label>
+                <section class="output-section">
+                    <h2>Texto Humanizado</h2>
+                    <textarea id="humanized-text" readonly placeholder="Aquí aparecerá tu texto humanizado e indetectable..."></textarea>
+                    
+                    <div class="ai-score" id="ai-score" style="display: none;">
+                        <p>Probabilidad de detección como IA: <span class="human-percentage" id="ai-percentage">0%</span></p>
+                        <div class="score-bar">
+                            <div class="score-fill" id="score-fill" style="width: 0%"></div>
+                        </div>
+                        <p id="ai-assessment">El texto parece completamente humano</p>
                     </div>
-                    <div class="option-group">
-                        <label>
-                            <input type="checkbox" id="vary-sentence-structure" checked>
-                            Variar estructura de oraciones
-                        </label>
+                    
+                    <div class="stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="original-words">0</div>
+                            <div class="stat-label">Palabras originales</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="humanized-words">0</div>
+                            <div class="stat-label">Palabras humanizadas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="readability-score">0</div>
+                            <div class="stat-label">Legibilidad</div>
+                        </div>
                     </div>
-                    <div class="option-group">
-                        <label>
-                            <input type="checkbox" id="add-colloquialisms" checked>
-                            Añadir expresiones coloquiales
-                        </label>
+                    
+                    <div class="quality-indicator" id="quality-indicator" style="display: none;">
+                        <p>✅ Tu texto ha sido humanizado exitosamente. La probabilidad de detección como IA se ha reducido significativamente.</p>
                     </div>
-                    <div class="option-group">
-                        <label>
-                            <input type="checkbox" id="break-patterns" checked>
-                            Romper patrones de IA
-                        </label>
+                    
+                    <div class="controls">
+                        <button class="btn-secondary" id="copy-btn">Copiar Texto</button>
+                        <button class="btn-secondary" id="download-btn">Descargar</button>
                     </div>
-                    <div class="option-group">
-                        <label>
-                            <input type="checkbox" id="add-personal-touch">
-                            Añadir toque personal
-                        </label>
-                    </div>
-                </div>
-                
-                <div class="controls">
-                    <button class="btn-secondary" id="clear-btn">Limpiar</button>
-                    <button class="btn-primary" id="humanize-btn">Humanizar Texto</button>
-                </div>
-                
-                <div class="processing-indicator" id="processing-indicator">
-                    <div class="spinner"></div>
-                    <p>Aplicando técnicas anti-detección... Esto puede tomar unos segundos</p>
-                </div>
-            </section>
+                </section>
+            </div>
             
-            <section class="output-section">
-                <h2>Texto Humanizado</h2>
-                <textarea id="humanized-text" readonly placeholder="Aquí aparecerá tu texto humanizado e indetectable..."></textarea>
-                
-                <div class="ai-score" id="ai-score" style="display: none;">
-                    <p>Probabilidad de detección como IA: <span class="human-percentage" id="ai-percentage">0%</span></p>
-                    <div class="score-bar">
-                        <div class="score-fill" id="score-fill" style="width: 0%"></div>
-                    </div>
-                    <p id="ai-assessment">El texto parece completamente humano</p>
+            <section class="history-section">
+                <h2>Historial de Textos Humanizados</h2>
+                <p>Haz clic en cualquier elemento del historial para cargarlo de nuevo</p>
+                <div class="history-list" id="history-list">
+                    <!-- El historial se cargará aquí dinámicamente -->
                 </div>
-                
-                <div class="stats">
-                    <div class="stat-item">
-                        <div class="stat-value" id="original-words">0</div>
-                        <div class="stat-label">Palabras originales</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="humanized-words">0</div>
-                        <div class="stat-label">Palabras humanizadas</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="readability-score">0</div>
-                        <div class="stat-label">Legibilidad</div>
-                    </div>
-                </div>
-                
-                <div class="quality-indicator" id="quality-indicator" style="display: none;">
-                    <p>✅ Tu texto ha sido humanizado exitosamente. La probabilidad de detección como IA se ha reducido significativamente.</p>
-                </div>
-                
                 <div class="controls">
-                    <button class="btn-secondary" id="copy-btn">Copiar Texto</button>
-                    <button class="btn-secondary" id="download-btn">Descargar</button>
+                    <button class="btn-secondary" id="clear-history-btn">Limpiar Historial</button>
                 </div>
             </section>
         </div>
         
-        <section class="history-section">
-            <h2>Historial de Textos</h2>
-            <p>Haz clic en cualquier elemento del historial para cargarlo de nuevo</p>
-            <div class="history-list" id="history-list">
-                <!-- El historial se cargará aquí dinámicamente -->
+        <!-- Pestaña Detector de IA -->
+        <div class="tab-content" id="detector-tab">
+            <div class="main-content">
+                <section class="input-section">
+                    <h2>Texto a Analizar</h2>
+                    <textarea id="detector-text" placeholder="Pega aquí el texto que quieres analizar (hasta 10,000 palabras)..."></textarea>
+                    <div class="word-count" id="detector-word-count">Palabras: 0</div>
+                    
+                    <div class="advanced-options">
+                        <h3>Opciones de Análisis</h3>
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="analyze-patterns" checked>
+                                Analizar patrones de IA
+                            </label>
+                        </div>
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="check-perplexity" checked>
+                                Evaluar complejidad
+                            </label>
+                        </div>
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="detect-repetition" checked>
+                                Detectar repeticiones
+                            </label>
+                        </div>
+                        <div class="option-group">
+                            <label>
+                                <input type="checkbox" id="evaluate-structure" checked>
+                                Evaluar estructura
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="controls">
+                        <button class="btn-secondary" id="detector-clear-btn">Limpiar</button>
+                        <button class="btn-primary" id="detect-btn">Analizar Texto</button>
+                    </div>
+                    
+                    <div class="processing-indicator" id="detector-processing-indicator">
+                        <div class="spinner"></div>
+                        <p>Analizando texto... Esto puede tomar unos segundos</p>
+                    </div>
+                </section>
+                
+                <section class="output-section">
+                    <h2>Resultados del Análisis</h2>
+                    
+                    <div class="detector-results" id="detector-results" style="display: none;">
+                        <div class="result-card">
+                            <div class="result-title">
+                                <span class="result-icon">🤖</span>
+                                <h3>Probabilidad de ser IA</h3>
+                            </div>
+                            <div class="confidence-meter">
+                                <div class="confidence-fill" id="ai-confidence-fill" style="width: 0%; background-color: #e74c3c;"></div>
+                            </div>
+                            <p id="ai-confidence-text">Cargando...</p>
+                        </div>
+                        
+                        <div class="result-card">
+                            <div class="result-title">
+                                <span class="result-icon">👤</span>
+                                <h3>Probabilidad de ser Humano</h3>
+                            </div>
+                            <div class="confidence-meter">
+                                <div class="confidence-fill" id="human-confidence-fill" style="width: 0%; background-color: #2ecc71;"></div>
+                            </div>
+                            <p id="human-confidence-text">Cargando...</p>
+                        </div>
+                        
+                        <div class="analysis-details">
+                            <h4>Detalles del Análisis</h4>
+                            <div class="detail-item">
+                                <span class="detail-label">Patrones de IA detectados:</span>
+                                <span class="detail-value" id="pattern-score">0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Variabilidad de oraciones:</span>
+                                <span class="detail-value" id="sentence-variability">0%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Repeticiones detectadas:</span>
+                                <span class="detail-value" id="repetition-score">0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Complejidad léxica:</span>
+                                <span class="detail-value" id="lexical-complexity">0%</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Estructura típica de IA:</span>
+                                <span class="detail-value" id="structure-score">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="quality-indicator" id="detector-quality-indicator" style="display: none;">
+                        <p id="detector-result-message">El análisis ha sido completado. Revisa los resultados arriba.</p>
+                    </div>
+                </section>
             </div>
-            <div class="controls">
-                <button class="btn-secondary" id="clear-history-btn">Limpiar Historial</button>
-            </div>
-        </section>
+            
+            <section class="history-section">
+                <h2>Historial de Análisis</h2>
+                <p>Haz clic en cualquier elemento del historial para cargarlo de nuevo</p>
+                <div class="history-list" id="detector-history-list">
+                    <!-- El historial se cargará aquí dinámicamente -->
+                </div>
+                <div class="controls">
+                    <button class="btn-secondary" id="detector-clear-history-btn">Limpiar Historial</button>
+                </div>
+            </section>
+        </div>
         
         <div class="footer">
-            <p>Aplicación desarrollada con HTML, CSS y JavaScript - Técnicas Anti-Detección IA</p>
+            <p>Aplicación desarrollada con HTML, CSS y JavaScript - Humanizador y Detector de IA</p>
             <p>© 2023 Humanizador de Textos - Todos los derechos reservados</p>
         </div>
     </div>
@@ -777,9 +1038,203 @@
             }
         }
 
+        // Clase para detectar contenido generado por IA
+        class IADetector {
+            constructor() {
+                this.aiPatterns = [
+                    { pattern: /En primer lugar|En segundo lugar|En tercer lugar/g, weight: 8 },
+                    { pattern: /Además|Por otra parte|Asimismo/g, weight: 5 },
+                    { pattern: /Sin embargo|No obstante|Por el contrario/g, weight: 5 },
+                    { pattern: /En conclusión|En resumen|Finalmente/g, weight: 8 },
+                    { pattern: /Es importante destacar|Cabe mencionar|Vale la pena señalar/g, weight: 6 },
+                    { pattern: /Por un lado|Por otro lado/g, weight: 5 },
+                    { pattern: /De esta manera|De este modo/g, weight: 5 },
+                    { pattern: /En cuanto a|Respecto a|En relación con/g, weight: 5 },
+                    { pattern: /Por lo tanto|En consecuencia/g, weight: 5 },
+                    { pattern: /Así pues|De este modo/g, weight: 4 }
+                ];
+                
+                this.humanPatterns = [
+                    { pattern: /o sea|digamos|bueno|pues/g, weight: 5 },
+                    { pattern: /la verdad|a ver|entonces/g, weight: 4 },
+                    { pattern: /me parece|yo creo|en mi opinión/g, weight: 6 },
+                    { pattern: /claro|desde luego|por supuesto/g, weight: 4 },
+                    { pattern: /fíjate|mira|oye/g, weight: 7 },
+                    { pattern: /¿no crees\?|¿verdad\?|¿no te parece\?/g, weight: 8 }
+                ];
+            }
+            
+            detectAI(text, options = {}) {
+                let aiScore = 0;
+                let humanScore = 0;
+                
+                // Analizar patrones de IA si está habilitado
+                if (options.analyzePatterns !== false) {
+                    aiScore += this.analyzeAIPatterns(text);
+                }
+                
+                // Evaluar complejidad si está habilitado
+                if (options.checkPerplexity !== false) {
+                    aiScore += this.evaluatePerplexity(text);
+                }
+                
+                // Detectar repeticiones si está habilitado
+                if (options.detectRepetition !== false) {
+                    aiScore += this.detectRepetition(text);
+                }
+                
+                // Evaluar estructura si está habilitado
+                if (options.evaluateStructure !== false) {
+                    aiScore += this.evaluateStructure(text);
+                }
+                
+                // Analizar patrones humanos
+                humanScore += this.analyzeHumanPatterns(text);
+                
+                // Ajustar puntuaciones
+                aiScore = Math.min(100, aiScore);
+                humanScore = Math.min(100, humanScore);
+                
+                // Calcular probabilidad final
+                const total = aiScore + humanScore;
+                const aiProbability = total > 0 ? Math.round((aiScore / total) * 100) : 50;
+                const humanProbability = 100 - aiProbability;
+                
+                // Calcular métricas detalladas
+                const details = {
+                    patternScore: this.analyzeAIPatterns(text),
+                    sentenceVariability: this.calculateSentenceVariability(text),
+                    repetitionScore: this.detectRepetition(text),
+                    lexicalComplexity: this.evaluateLexicalComplexity(text),
+                    structureScore: this.evaluateStructure(text)
+                };
+                
+                return {
+                    aiProbability,
+                    humanProbability,
+                    details
+                };
+            }
+            
+            analyzeAIPatterns(text) {
+                let score = 0;
+                
+                for (const { pattern, weight } of this.aiPatterns) {
+                    const matches = text.match(pattern);
+                    if (matches) {
+                        score += matches.length * weight;
+                    }
+                }
+                
+                return Math.min(40, score);
+            }
+            
+            analyzeHumanPatterns(text) {
+                let score = 0;
+                
+                for (const { pattern, weight } of this.humanPatterns) {
+                    const matches = text.match(pattern);
+                    if (matches) {
+                        score += matches.length * weight;
+                    }
+                }
+                
+                return Math.min(40, score);
+            }
+            
+            evaluatePerplexity(text) {
+                // Evaluación simplificada de complejidad/perplejidad
+                const words = text.split(/\s+/).filter(w => w.length > 0);
+                const uniqueWords = [...new Set(words)];
+                const uniqueRatio = uniqueWords.length / words.length;
+                
+                // Textos con menor diversidad léxica son más probables de ser IA
+                return Math.max(0, 20 - (uniqueRatio * 20));
+            }
+            
+            detectRepetition(text) {
+                // Detectar repeticiones de palabras y frases
+                const words = text.split(/\s+/);
+                const wordCount = {};
+                
+                words.forEach(word => {
+                    const cleanWord = word.toLowerCase().replace(/[.,!?;:()]/g, '');
+                    if (cleanWord.length > 3) {
+                        wordCount[cleanWord] = (wordCount[cleanWord] || 0) + 1;
+                    }
+                });
+                
+                // Calcular repeticiones excesivas
+                let repetitionScore = 0;
+                Object.values(wordCount).forEach(count => {
+                    if (count > 5) {
+                        repetitionScore += (count - 5) * 2;
+                    }
+                });
+                
+                return Math.min(20, repetitionScore);
+            }
+            
+            evaluateStructure(text) {
+                // Evaluar la estructura del texto
+                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                if (sentences.length < 3) return 0;
+                
+                const sentenceLengths = sentences.map(s => s.split(/\s+/).length);
+                const avgLength = sentenceLengths.reduce((a, b) => a + b, 0) / sentenceLengths.length;
+                
+                // Textos con oraciones de longitud muy uniforme son más probables de ser IA
+                const variance = this.calculateVariance(sentenceLengths);
+                
+                let structureScore = 0;
+                if (variance < 30) structureScore += 10;
+                if (variance < 20) structureScore += 10;
+                
+                // Oraciones muy largas también son indicador de IA
+                if (avgLength > 25) structureScore += 10;
+                
+                return Math.min(20, structureScore);
+            }
+            
+            evaluateLexicalComplexity(text) {
+                // Evaluar complejidad léxica
+                const words = text.split(/\s+/).filter(w => w.length > 0);
+                const longWords = words.filter(w => w.length > 6);
+                const longWordRatio = longWords.length / words.length;
+                
+                // Porcentaje de palabras complejas (simulación)
+                return Math.round(longWordRatio * 100);
+            }
+            
+            calculateSentenceVariability(text) {
+                // Calcular variabilidad de longitud de oraciones
+                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+                if (sentences.length < 3) return 0;
+                
+                const sentenceLengths = sentences.map(s => s.split(/\s+/).length);
+                const variance = this.calculateVariance(sentenceLengths);
+                
+                // Normalizar a porcentaje (más variación = más humano)
+                return Math.min(100, Math.round(variance));
+            }
+            
+            calculateVariance(numbers) {
+                if (numbers.length === 0) return 0;
+                
+                const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
+                const squaredDiffs = numbers.map(num => Math.pow(num - mean, 2));
+                const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / numbers.length;
+                
+                return variance;
+            }
+        }
+
         // Inicialización cuando el DOM esté listo
         document.addEventListener('DOMContentLoaded', function() {
             const humanizer = new TextHumanizer();
+            const detector = new IADetector();
+            
+            // Elementos de la pestaña Humanizador
             const originalText = document.getElementById('original-text');
             const humanizedText = document.getElementById('humanized-text');
             const wordCount = document.getElementById('word-count');
@@ -806,10 +1261,59 @@
             const breakPatterns = document.getElementById('break-patterns');
             const addPersonalTouch = document.getElementById('add-personal-touch');
             
-            // Cargar historial desde localStorage
-            loadHistory();
+            // Elementos de la pestaña Detector
+            const detectorText = document.getElementById('detector-text');
+            const detectorWordCount = document.getElementById('detector-word-count');
+            const detectBtn = document.getElementById('detect-btn');
+            const detectorClearBtn = document.getElementById('detector-clear-btn');
+            const detectorProcessingIndicator = document.getElementById('detector-processing-indicator');
+            const detectorResults = document.getElementById('detector-results');
+            const detectorQualityIndicator = document.getElementById('detector-quality-indicator');
+            const detectorResultMessage = document.getElementById('detector-result-message');
+            const detectorHistoryList = document.getElementById('detector-history-list');
+            const detectorClearHistoryBtn = document.getElementById('detector-clear-history-btn');
             
-            // Actualizar contador de palabras
+            // Elementos de resultados del detector
+            const aiConfidenceFill = document.getElementById('ai-confidence-fill');
+            const humanConfidenceFill = document.getElementById('human-confidence-fill');
+            const aiConfidenceText = document.getElementById('ai-confidence-text');
+            const humanConfidenceText = document.getElementById('human-confidence-text');
+            const patternScore = document.getElementById('pattern-score');
+            const sentenceVariability = document.getElementById('sentence-variability');
+            const repetitionScore = document.getElementById('repetition-score');
+            const lexicalComplexity = document.getElementById('lexical-complexity');
+            const structureScore = document.getElementById('structure-score');
+            
+            // Opciones del detector
+            const analyzePatterns = document.getElementById('analyze-patterns');
+            const checkPerplexity = document.getElementById('check-perplexity');
+            const detectRepetition = document.getElementById('detect-repetition');
+            const evaluateStructure = document.getElementById('evaluate-structure');
+            
+            // Sistema de pestañas
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Actualizar pestañas activas
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Cargar historiales desde localStorage
+            loadHistory();
+            loadDetectorHistory();
+            
+            // ========== FUNCIONALIDAD HUMANIZADOR ==========
+            
+            // Actualizar contador de palabras (Humanizador)
             originalText.addEventListener('input', function() {
                 const text = originalText.value.trim();
                 const words = text ? text.split(/\s+/).length : 0;
@@ -824,7 +1328,7 @@
                 }
             });
             
-            // Limpiar texto
+            // Limpiar texto (Humanizador)
             clearBtn.addEventListener('click', function() {
                 originalText.value = '';
                 humanizedText.value = '';
@@ -952,7 +1456,7 @@
                 URL.revokeObjectURL(url);
             });
             
-            // Limpiar historial
+            // Limpiar historial (Humanizador)
             clearHistoryBtn.addEventListener('click', function() {
                 if (confirm('¿Estás seguro de que quieres borrar todo el historial?')) {
                     localStorage.removeItem('textHumanizerHistory');
@@ -960,7 +1464,119 @@
                 }
             });
             
-            // Funciones para manejar el historial
+            // ========== FUNCIONALIDAD DETECTOR ==========
+            
+            // Actualizar contador de palabras (Detector)
+            detectorText.addEventListener('input', function() {
+                const text = detectorText.value.trim();
+                const words = text ? text.split(/\s+/).length : 0;
+                detectorWordCount.textContent = `Palabras: ${words}`;
+                
+                // Deshabilitar botón si hay más de 10,000 palabras
+                if (words > 10000) {
+                    detectBtn.disabled = true;
+                    detectorWordCount.innerHTML = `Palabras: <span style="color:red">${words} (Límite: 10,000)</span>`;
+                } else {
+                    detectBtn.disabled = false;
+                }
+            });
+            
+            // Limpiar texto (Detector)
+            detectorClearBtn.addEventListener('click', function() {
+                detectorText.value = '';
+                detectorWordCount.textContent = 'Palabras: 0';
+                detectorResults.style.display = 'none';
+                detectorQualityIndicator.style.display = 'none';
+            });
+            
+            // Detectar IA
+            detectBtn.addEventListener('click', function() {
+                const text = detectorText.value.trim();
+                if (!text) {
+                    alert('Por favor, ingresa un texto para analizar.');
+                    return;
+                }
+                
+                const wordCount = text.split(/\s+/).length;
+                if (wordCount > 10000) {
+                    alert('El texto excede el límite de 10,000 palabras.');
+                    return;
+                }
+                
+                // Mostrar indicador de procesamiento
+                detectorProcessingIndicator.style.display = 'block';
+                detectBtn.disabled = true;
+                
+                // Usar setTimeout para permitir que la UI se actualice
+                setTimeout(function() {
+                    try {
+                        // Obtener opciones seleccionadas
+                        const options = {
+                            analyzePatterns: analyzePatterns.checked,
+                            checkPerplexity: checkPerplexity.checked,
+                            detectRepetition: detectRepetition.checked,
+                            evaluateStructure: evaluateStructure.checked
+                        };
+                        
+                        // Analizar texto
+                        const results = detector.detectAI(text, options);
+                        
+                        // Mostrar resultados
+                        detectorResults.style.display = 'block';
+                        detectorQualityIndicator.style.display = 'block';
+                        
+                        // Actualizar barras de confianza
+                        aiConfidenceFill.style.width = `${results.aiProbability}%`;
+                        humanConfidenceFill.style.width = `${results.humanProbability}%`;
+                        
+                        // Actualizar textos de confianza
+                        aiConfidenceText.textContent = `${results.aiProbability}% de probabilidad`;
+                        humanConfidenceText.textContent = `${results.humanProbability}% de probabilidad`;
+                        
+                        // Actualizar detalles del análisis
+                        patternScore.textContent = results.details.patternScore;
+                        sentenceVariability.textContent = `${results.details.sentenceVariability}%`;
+                        repetitionScore.textContent = results.details.repetitionScore;
+                        lexicalComplexity.textContent = `${results.details.lexicalComplexity}%`;
+                        structureScore.textContent = `${results.details.structureScore}%`;
+                        
+                        // Mensaje de resultado
+                        if (results.aiProbability > 70) {
+                            detectorResultMessage.textContent = '⚠️ Este texto tiene alta probabilidad de haber sido generado por IA.';
+                            detectorResultMessage.style.color = '#e74c3c';
+                        } else if (results.aiProbability > 40) {
+                            detectorResultMessage.textContent = '🔍 Este texto muestra algunas características de IA, pero no es concluyente.';
+                            detectorResultMessage.style.color = '#f39c12';
+                        } else {
+                            detectorResultMessage.textContent = '✅ Este texto parece haber sido escrito por un humano.';
+                            detectorResultMessage.style.color = '#2ecc71';
+                        }
+                        
+                        // Guardar en historial del detector
+                        saveToDetectorHistory(text, results);
+                        
+                    } catch (error) {
+                        console.error('Error:', error);
+                        alert('Error al analizar el texto. Por favor, intenta de nuevo.');
+                    } finally {
+                        // Ocultar indicador de procesamiento
+                        detectorProcessingIndicator.style.display = 'none';
+                        detectBtn.disabled = false;
+                    }
+                }, 100);
+            });
+            
+            // Limpiar historial (Detector)
+            detectorClearHistoryBtn.addEventListener('click', function() {
+                if (confirm('¿Estás seguro de que quieres borrar todo el historial?')) {
+                    localStorage.removeItem('textDetectorHistory');
+                    detectorHistoryList.innerHTML = '<p>No hay elementos en el historial</p>';
+                }
+            });
+            
+            // ========== FUNCIONES AUXILIARES ==========
+            
+            // Funciones para manejar el historial del humanizador
             function saveToHistory(original, humanized, originalCount, humanizedCount, readability, aiScore) {
                 const history = getHistory();
                 const newItem = {
@@ -1040,6 +1656,99 @@
                     });
                     
                     historyList.appendChild(historyItem);
+                });
+            }
+            
+            // Funciones para manejar el historial del detector
+            function saveToDetectorHistory(text, results) {
+                const history = getDetectorHistory();
+                const newItem = {
+                    id: Date.now(),
+                    date: new Date().toLocaleString(),
+                    text: text,
+                    aiProbability: results.aiProbability,
+                    humanProbability: results.humanProbability,
+                    details: results.details
+                };
+                
+                history.unshift(newItem);
+                
+                // Mantener solo los últimos 10 elementos
+                if (history.length > 10) {
+                    history.pop();
+                }
+                
+                localStorage.setItem('textDetectorHistory', JSON.stringify(history));
+                loadDetectorHistory();
+            }
+            
+            function getDetectorHistory() {
+                const historyJSON = localStorage.getItem('textDetectorHistory');
+                return historyJSON ? JSON.parse(historyJSON) : [];
+            }
+            
+            function loadDetectorHistory() {
+                const history = getDetectorHistory();
+                detectorHistoryList.innerHTML = '';
+                
+                if (history.length === 0) {
+                    detectorHistoryList.innerHTML = '<p>No hay elementos en el historial</p>';
+                    return;
+                }
+                
+                history.forEach(item => {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'history-item';
+                    
+                    let probabilityClass = 'ai-score-low';
+                    if (item.aiProbability > 70) probabilityClass = 'ai-score-high';
+                    else if (item.aiProbability > 40) probabilityClass = 'ai-score-medium';
+                    
+                    historyItem.innerHTML = `
+                        <div><strong>${item.text.substring(0, 50)}${item.text.length > 50 ? '...' : ''}</strong></div>
+                        <div class="history-date">${item.date} - <span class="${probabilityClass}">IA: ${item.aiProbability}%</span></div>
+                    `;
+                    
+                    historyItem.addEventListener('click', function() {
+                        detectorText.value = item.text;
+                        
+                        // Actualizar contador de palabras
+                        const words = item.text ? item.text.split(/\s+/).length : 0;
+                        detectorWordCount.textContent = `Palabras: ${words}`;
+                        
+                        // Mostrar resultados
+                        detectorResults.style.display = 'block';
+                        detectorQualityIndicator.style.display = 'block';
+                        
+                        // Actualizar barras de confianza
+                        aiConfidenceFill.style.width = `${item.aiProbability}%`;
+                        humanConfidenceFill.style.width = `${item.humanProbability}%`;
+                        
+                        // Actualizar textos de confianza
+                        aiConfidenceText.textContent = `${item.aiProbability}% de probabilidad`;
+                        humanConfidenceText.textContent = `${item.humanProbability}% de probabilidad`;
+                        
+                        // Actualizar detalles del análisis
+                        patternScore.textContent = item.details.patternScore;
+                        sentenceVariability.textContent = `${item.details.sentenceVariability}%`;
+                        repetitionScore.textContent = item.details.repetitionScore;
+                        lexicalComplexity.textContent = `${item.details.lexicalComplexity}%`;
+                        structureScore.textContent = `${item.details.structureScore}%`;
+                        
+                        // Mensaje de resultado
+                        if (item.aiProbability > 70) {
+                            detectorResultMessage.textContent = '⚠️ Este texto tiene alta probabilidad de haber sido generado por IA.';
+                            detectorResultMessage.style.color = '#e74c3c';
+                        } else if (item.aiProbability > 40) {
+                            detectorResultMessage.textContent = '🔍 Este texto muestra algunas características de IA, pero no es concluyente.';
+                            detectorResultMessage.style.color = '#f39c12';
+                        } else {
+                            detectorResultMessage.textContent = '✅ Este texto parece haber sido escrito por un humano.';
+                            detectorResultMessage.style.color = '#2ecc71';
+                        }
+                    });
+                    
+                    detectorHistoryList.appendChild(historyItem);
                 });
             }
         });
