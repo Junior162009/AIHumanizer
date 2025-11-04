@@ -1,288 +1,309 @@
-<!DOCTYPE html><html lang="es">
+<!DOCTYPE html>
+<html lang="es">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Humanizador y Detector de IA — Versión Mejorada</title>
-  <meta name="description" content="Humanizador y detector de IA. Implementación completa en HTML5/CSS3/JavaScript. Incluye código fuente C y Rust descargable y guía para compilar a WebAssembly (WASM) para multiplataforma." />
+  <title>Humanizador y Detector de IA — Versión Mejorada (Ensemble)</title>
+  <meta name="description" content="Humanizador y ensemble de detectores de IA. Implementación HTML5/CSS3/JS. Incluye adaptadores para servicios externos (configurables)." />
   <style>
-    /* Diseño moderno, responsivo y accesible (CSS3) */
-    :root{
-      --bg:#f5f7fb; --card:#fff; --brand:#2563eb; --muted:#6b7280; --accent:#06b6d4; --success:#10b981; --danger:#ef4444;
-      --radius:14px; --gap:18px; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-    }
+    :root{--bg:#f5f7fb;--card:#fff;--brand:#2563eb;--muted:#6b7280;--radius:12px;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
     *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:linear-gradient(180deg,var(--bg),#eef2ff);color:#0f172a;padding:24px}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#eef2ff);color:#0f172a;padding:20px}
     .wrap{max-width:1100px;margin:0 auto}
-    header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
-    header h1{font-size:1.4rem;margin:0}
-    .grid{display:grid;grid-template-columns:1fr 420px;gap:20px}
-    @media(max-width:900px){.grid{grid-template-columns:1fr}}
-    .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:0 8px 24px rgba(12,17,43,0.06)}
-    textarea{width:100%;min-height:260px;padding:12px;border:1px solid #e6eef8;border-radius:10px;font-size:15px}
-    label{font-weight:600;color:var(--muted);font-size:0.92rem}
-    .controls{display:flex;gap:10px;margin-top:12px}
-    button{background:var(--brand);color:white;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
-    button.secondary{background:#eef2ff;color:var(--brand)}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    h1{font-size:1.2rem;margin:0}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+    @media(max-width:920px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 8px 20px rgba(13,18,35,0.06)}
+    textarea{width:100%;min-height:200px;padding:12px;border-radius:10px;border:1px solid #e6eef8;font-size:14px}
+    .controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+    button{background:var(--brand);color:white;padding:10px 12px;border-radius:9px;border:none;cursor:pointer;font-weight:600}
+    button.secondary{background:transparent;color:var(--brand);border:1px solid #e6f0ff}
     .small{font-size:0.9rem;color:var(--muted)}
-    .stat-row{display:flex;gap:12px;margin-top:14px}
-    .stat{background:#f8fafc;padding:10px;border-radius:8px;flex:1;text-align:center}
-    .stat .num{font-weight:700;color:var(--brand);font-size:1.1rem}
-    .options{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
-    @media(max-width:600px){.options{grid-template-columns:1fr}}
-    .history{max-height:250px;overflow:auto;margin-top:12px;padding:8px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff}
-    .history-item{padding:8px;border-bottom:1px solid #eef6ff;cursor:pointer}
-    .badge{display:inline-block;padding:6px 8px;border-radius:999px;background:#f0f9ff;color:#0369a1;font-weight:600;font-size:0.85rem}
-    footer{margin-top:18px;color:var(--muted);font-size:0.9rem}
-    /* barra de progreso */
-    .bar{height:12px;background:#eef2ff;border-radius:999px;overflow:hidden}
-    .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--brand));width:0%}
-    /* accesibilidad */
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .history{max-height:220px;overflow:auto;margin-top:12px;padding:8px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <h1>Humanizador y Detector de IA — Mejorado</h1>
-      <div class="small">HTML5 · CSS3 · JavaScript + Código fuente C y Rust (multiplataforma / WASM)</div>
-    </header><main class="grid">
-  <!-- Área principal -->
-  <section class="card" aria-labelledby="input-title">
-    <h2 id="input-title">Texto original (IA)</h2>
-    <textarea id="inputText" placeholder="Pega aquí tu texto generado por IA..."></textarea>
-    <div class="stat-row">
-      <div class="stat"><div class="num" id="wordCount">0</div><div class="small">Palabras</div></div>
-      <div class="stat"><div class="num" id="readScore">0</div><div class="small">Legibilidad</div></div>
-      <div class="stat"><div class="num" id="aiProb">—</div><div class="small">Prob. IA</div></div>
-    </div>
-
-    <div class="options" role="group" aria-label="Opciones de humanización">
-      <label><input type="checkbox" id="optErrors" checked> Añadir errores leves</label>
-      <label><input type="checkbox" id="optColloq" checked> Añadir coloquialismos</label>
-      <label><input type="checkbox" id="optVary" checked> Variar estructura</label>
-      <label><input type="checkbox" id="optPersonal"> Añadir toque personal</label>
-    </div>
-
-    <div class="controls">
-      <button id="btnHumanize">Humanizar (JS)</button>
-      <button class="secondary" id="btnDetect">Detectar (JS)</button>
-      <button class="secondary" id="btnClear">Limpiar</button>
-    </div>
-
-    <div class="small" style="margin-top:8px">Procesamiento en Web Worker — mantiene la UI reactiva con textos largos.</div>
-
-    <div class="history" id="historyList" aria-live="polite" aria-atomic="false">
-      <!-- historial guardado -->
-    </div>
-  </section>
-
-  <!-- Panel derecho: resultados, descargas y código fuente -->
-  <aside class="card" aria-labelledby="results-title">
-    <h2 id="results-title">Resultados y Descargas</h2>
-
-    <label for="outputText">Texto humanizado</label>
-    <textarea id="outputText" readonly placeholder="Aquí aparecerá el texto humanizado..."></textarea>
-
-    <div style="margin-top:10px">
-      <div class="bar" aria-hidden="true"><i id="progressFill"></i></div>
-    </div>
-
-    <div style="display:flex;gap:8px;margin-top:12px">
-      <button id="btnCopy">Copiar</button>
-      <button class="secondary" id="btnDownloadTxt">Descargar .txt</button>
-    </div>
-
-    <hr style="margin:12px 0" />
-
-    <h3>Descargar código fuente</h3>
-    <p class="small">Incluyo implementaciones sencillas en C y Rust. Estas se pueden compilar localmente (multiplataforma) o convertir a WebAssembly para ejecutarlas en el navegador.</p>
-
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button id="downloadC" class="secondary">Descargar C</button>
-      <button id="downloadRust" class="secondary">Descargar Rust</button>
-      <button id="downloadPy" class="secondary">Descargar Python (opcional)</button>
-    </div>
-
-    <details style="margin-top:12px">
-      <summary>Guía rápida: compilar a WebAssembly (Emscripten / wasm-pack)</summary>
-      <div class="small" style="margin-top:8px">
-        <strong>C → WASM (Emscripten)</strong>
-        <ol>
-          <li>Instala Emscripten: <code>https://emscripten.org/docs/getting_started/downloads.html</code></li>
-          <li>Compila: <code>emcc humanizer.c -O3 -s WASM=1 -s EXPORTED_FUNCTIONS='["_humanize","_estimate_ai"]' -o humanizer.js</code></li>
-          <li>Incluye <code>humanizer.js</code> y <code>humanizer.wasm</code> en tu página y llama a las funciones exportadas.</li>
-        </ol>
-        <strong>Rust → WASM (wasm-pack)</strong>
-        <ol>
-          <li>Instala Rust y <code>wasm-pack</code>.</li>
-          <li>En tu crate: <code>wasm-pack build --target web</code></li>
-          <li>Incluye el paquete generado en tu app web o en Node.js.</li>
-        </ol>
+      <div>
+        <h1>Humanizador y Detector de IA — Ensemble</h1>
+        <div class="small">Analizadores locales + adaptadores para OpenAI, HuggingFace y endpoints genéricos.</div>
       </div>
-    </details>
+    </header>
 
-    <hr style="margin:12px 0" />
+    <main class="grid">
+      <section class="card" aria-labelledby="input-title">
+        <h2 id="input-title">Texto original</h2>
+        <textarea id="inputText" placeholder="Pega aquí tu texto..."></textarea>
 
-    <h3>Sugerencia de lenguaje multiplataforma</h3>
-    <p class="small">Recomiendo <strong>Rust</strong> si quieres rendimiento y facilidad para compilar a WebAssembly y a binarios nativos en Windows/macOS/Linux. Alternativa más simple: <strong>Python</strong> para scripts y backend multiplataforma.</p>
+        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+          <label class="small"><input id="optErrors" type="checkbox" checked> Reemplazos semánticos</label>
+          <label class="small"><input id="optColloq" type="checkbox" checked> Coloquialismos</label>
+          <label class="small"><input id="optVary" type="checkbox"> Variar estructura</label>
+        </div>
 
-    <footer>
-      <div class="small">Exporté código C y Rust minimal para que los descargues y pruebes. También se incluye una versión en Python para prototipado rápido.</div>
-    </footer>
-  </aside>
-</main>
+        <div class="controls">
+          <button id="btnHumanize">Humanizar (local)</button>
+          <button id="btnDetect" class="secondary">Detectar (ensemble)</button>
+          <button id="btnClear" class="secondary">Limpiar</button>
+        </div>
 
-  </div>  <!-- Implementación JavaScript modular y ligera. Incluye Web Worker inline vía Blob para compatibilidad sin archivos extra. -->  <script>
-    // Código fuente (strings) para descarga: C, Rust y Python
-    const cSource = `// humanizer.c — implementación mínima\n#include <stdio.h>\n#include <string.h>\n#include <stdlib.h>\n// Funciones simples: reemplazo de palabras formales por informales (muy básico)\nchar* humanize_simple(const char* text) {\n    // Esta implementación realiza reemplazos básicos y devuelve un nuevo string (malloc)\n    size_t len = strlen(text);\n    char* out = malloc(len*2 + 100); // espacio extra para cambios\n    if (!out) return NULL;\n    strcpy(out, text);\n    // Reemplazo estático de ejemplo\n    // Nota: para producción usa una implementación que busque y reemplace de forma segura\n    char* p = strstr(out, "utilizar"); if (p) memcpy(p, "usar     ", 8);\n    p = strstr(out, "finalizar"); if (p) memcpy(p, "terminar ", 8);\n    return out;\n}\nint main() {\n    char buf[4096];\n    size_t r = fread(buf,1,sizeof(buf)-1,stdin); buf[r]=0;\n    char* result = humanize_simple(buf);\n    if (result) { printf("%s", result); free(result); }\n    return 0;\n}\n`;
+        <div class="small" style="margin-top:8px">Historial</div>
+        <div class="history" id="historyList">No hay historial.</div>
+      </section>
 
-    const rustSource = `// lib.rs — crate simple para humanizar (ejemplo)\n// Usa wasm-bindgen para exportar a JS si lo compilas a WASM\nuse wasm_bindgen::prelude::*;\n\n#[wasm_bindgen]\npub fn humanize(text: &str) -> String {\n    // Reemplazos muy básicos\n    text.replace("utilizar","usar").replace("finalizar","terminar")\n}\n`;
+      <aside class="card" aria-labelledby="results-title">
+        <h2 id="results-title">Resultados</h2>
+        <label class="small">Texto procesado</label>
+        <textarea id="outputText" readonly placeholder="Aquí aparecerá el resultado..."></textarea>
 
-    const pySource = `# humanizer.py - versión prototipo\nreplacements = {\n  'utilizar':'usar', 'finalizar':'terminar', 'iniciar':'empezar'\n}\n\ndef humanize(text):\n  for k,v in replacements.items():\n    text = text.replace(k, v)\n  return text\n\nif __name__=='__main__':\n  import sys\n  data = sys.stdin.read()\n  print(humanize(data))\n`;
+        <div style="margin-top:12px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button id="btnCopy">Copiar</button>
+            <button id="btnDownloadTxt" class="secondary">Descargar .txt</button>
+          </div>
+        </div>
 
-    // Helpers para descargar archivos desde el navegador
-    function downloadFile(filename, content, mime='text/plain'){
-      const blob = new Blob([content], {type:mime});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
-      URL.revokeObjectURL(url);
-    }
+        <hr style="margin:12px 0" />
 
-    // UI bindings
+        <div id="ensemblePanel">
+          <!-- Panel dinámico añadido por script -->
+        </div>
+
+      </aside>
+    </main>
+  </div>
+
+  <script>
+  // Código principal: utilidades, detector local, adaptadores y UI
+  (function(){
+    // Helpers
+    function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+    function downloadFile(filename, content, mime='text/plain'){ const blob=new Blob([content],{type:mime}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href); }
+
+    // DOM
     const input = document.getElementById('inputText');
     const output = document.getElementById('outputText');
     const btnHumanize = document.getElementById('btnHumanize');
     const btnDetect = document.getElementById('btnDetect');
     const btnClear = document.getElementById('btnClear');
-    const wordCount = document.getElementById('wordCount');
-    const readScore = document.getElementById('readScore');
-    const aiProb = document.getElementById('aiProb');
-    const progressFill = document.getElementById('progressFill');
     const historyList = document.getElementById('historyList');
-
-    const downloadC = document.getElementById('downloadC');
-    const downloadRust = document.getElementById('downloadRust');
-    const downloadPy = document.getElementById('downloadPy');
     const btnCopy = document.getElementById('btnCopy');
     const btnDownloadTxt = document.getElementById('btnDownloadTxt');
 
-    // Almacenamiento simple (localStorage)
-    function saveHistory(item) {
-      const h = JSON.parse(localStorage.getItem('humanizerHistory')||'[]');
-      h.unshift(item); if (h.length>12) h.pop(); localStorage.setItem('humanizerHistory', JSON.stringify(h));
-      renderHistory();
+    // ---------- Heurísticos locales ----------
+    function lexicalDiversity(text){
+      try{
+        const words = (text.match(/\\b[\\p{L}']+\\b/gu) || []);
+        const unique = new Set(words.map(w=>w.toLowerCase()));
+        return words.length ? unique.size/words.length : 1;
+      }catch(e){ // fallback simple
+        const words = (text.match(/\\b[\\w']+\\b/g) || []); const unique = new Set(words.map(w=>w.toLowerCase())); return words.length? unique.size/words.length:1;
+      }
+    }
+    function avgSentenceLength(text){
+      const s = (text.match(/[^.!?]+[.!?]?/g) || [text]);
+      const words = text.trim().split(/\\s+/).filter(Boolean).length || 0;
+      return s.length ? words/s.length : 0;
+    }
+    function repetitionScore(text){
+      const words = text.toLowerCase().split(/\\s+/).filter(Boolean);
+      const freq = {}; for (const w of words) freq[w]=(freq[w]||0)+1;
+      const overused = Object.values(freq).filter(v=>v>6).length;
+      return Math.min(1, overused/5);
+    }
+    function ngramPredictability(text, n=3){
+      const tokens = text.toLowerCase().split(/\\s+/).filter(Boolean);
+      if (tokens.length< n+1) return 0;
+      const grams = {};
+      for (let i=0;i<=tokens.length-n;i++){ const g = tokens.slice(i,i+n).join(' '); grams[g]=(grams[g]||0)+1; }
+      const repeats = Object.values(grams).filter(v=>v>1).reduce((a,b)=>a+b,0);
+      return repeats / Math.max(1, tokens.length-n);
+    }
+
+    function localDetectorScore(text){
+      const lex = lexicalDiversity(text);
+      const avg = avgSentenceLength(text);
+      const rep = repetitionScore(text);
+      const pred = ngramPredictability(text);
+      const score = Math.round( clamp( 30*(1-lex) + 25*rep + 25*pred + 20*(avg>28?1:0), 0, 100) );
+      return {score, details:{lexicalDiversity:lex,avgSentLen:avg,repetition:rep,ngramPredictability:pred}};
+    }
+
+    // ---------- Adaptadores externos (requieren keys/endpoints) ----------
+    async function callOpenAIClassifier(text, apiKey, model='gpt-4o-mini-classifier'){
+      if (!apiKey) return {ok:false,error:'No API key'};
+      try{
+        const res = await fetch('https://api.openai.com/v1/classifications',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model,query:text})});
+        if (!res.ok) return {ok:false,error:await res.text()};
+        const data = await res.json();
+        const score = data.label? (data.label==='ai_generated'?80:20) : 50;
+        return {ok:true,score,meta:data};
+      }catch(err){ return {ok:false,error:err.message}; }
+    }
+
+    async function callHuggingFaceDetector(text, token, model='textattack/roberta-base-rotten-tomatoes'){
+      if (!token) return {ok:false,error:'No HF token'};
+      try{
+        const res = await fetch('https://api-inference.huggingface.co/models/' + encodeURIComponent(model), {method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({inputs:text})});
+        if (!res.ok) return {ok:false,error:await res.text()};
+        const data = await res.json();
+        // mapping best-effort
+        const score = data && data[0] && data[0].score ? Math.round(data[0].score*100) : 50;
+        return {ok:true,score,meta:data};
+      }catch(err){ return {ok:false,error:err.message}; }
+    }
+
+    async function callGenericDetector(text, url, headers){
+      try{
+        const res = await fetch(url,{method:'POST',headers:Object.assign({'Content-Type':'application/json'},headers||{}),body:JSON.stringify({text})});
+        if (!res.ok) return {ok:false,error:await res.text()};
+        const data = await res.json();
+        let score = 50;
+        if (data.ai_probability!==undefined) score = Math.round(data.ai_probability*100);
+        else if (data.score!==undefined) score = Math.round(data.score);
+        return {ok:true,score,meta:data};
+      }catch(err){ return {ok:false,error:err.message}; }
+    }
+
+    // ---------- Ensemble orchestration ----------
+    async function runEnsemble(text, detectorsConfig){
+      const results = [];
+      if (!detectorsConfig || detectorsConfig.useLocal !== false){
+        const local = localDetectorScore(text);
+        results.push({name:'local_heuristic', score:local.score, details:local.details});
+      }
+      if (detectorsConfig && detectorsConfig.openai && detectorsConfig.openai.key){
+        const r = await callOpenAIClassifier(text, detectorsConfig.openai.key, detectorsConfig.openai.model); if (r.ok) results.push({name:'openai',score:r.score,meta:r.meta}); else results.push({name:'openai',error:r.error});
+      }
+      if (detectorsConfig && detectorsConfig.huggingface && detectorsConfig.huggingface.token){
+        const r = await callHuggingFaceDetector(text, detectorsConfig.huggingface.token, detectorsConfig.huggingface.model); if (r.ok) results.push({name:'huggingface',score:r.score,meta:r.meta}); else results.push({name:'huggingface',error:r.error});
+      }
+      if (detectorsConfig && Array.isArray(detectorsConfig.generic)){
+        for (const g of detectorsConfig.generic){ const r = await callGenericDetector(text, g.url, g.headers||{}); if (r.ok) results.push({name:g.name||'generic',score:r.score,meta:r.meta}); else results.push({name:g.name||'generic',error:r.error}); }
+      }
+      const numeric = results.filter(r=>typeof r.score==='number');
+      let aggregate = null;
+      if (numeric.length){
+        let sum=0, wsum=0;
+        for (const r of numeric){ const w = (r.name==='local_heuristic')?0.6:1.0; sum += r.score * w; wsum += w; }
+        aggregate = Math.round(sum/wsum);
+      }
+      return {results, aggregate};
+    }
+
+    // ---------- Humanizadores ----------
+    async function runHumanizers(text, config){
+      let out = text;
+      function localHumanize(t, opts){
+        if (opts.synonyms) t = t.replace(/\\butilizar\\b/gi,'usar').replace(/\\bfinalizar\\b/gi,'terminar');
+        if (opts.colloq) t = t.replace(/\\bpor ejemplo\\b/gi,'por ejemplo, mira');
+        if (opts.vary) t = t.replace(/,\\s+/g,',\\n');
+        return t;
+      }
+      out = localHumanize(out, config.localOptions||{synonyms:true,colloq:true,vary:false});
+      if (config && Array.isArray(config.remotes)){
+        for (const r of config.remotes){
+          try{
+            const res = await fetch(r.url,{method:r.method||'POST',headers:Object.assign({'Content-Type':'application/json'},r.headers||{}),body:JSON.stringify({text:out,opts:r.opts||{}})});
+            if (!res.ok) continue;
+            const j = await res.json(); if (j.humanized) out = j.humanized;
+          }catch(e){ console.warn('remote humanizer error', e.message); }
+        }
+      }
+      return out;
+    }
+
+    // ---------- UI: panel ensemble ----------
+    (function buildPanel(){
+      const panel = document.getElementById('ensemblePanel');
+      panel.innerHTML = `
+        <div style="margin-top:8px">
+          <h3 style="margin:0 0 8px 0">Ensemble Detectores / Humanizadores</h3>
+          <div class="small">Introduce keys (opcional) y/o URL de detector/humanizador remoto.</div>
+          <div style="margin-top:8px;display:grid;gap:8px">
+            <label class="small">OpenAI Key (opcional): <input id="cfg_openai_key" type="password" placeholder="sk-..." style="width:100%"></label>
+            <label class="small">HuggingFace Token (opcional): <input id="cfg_hf_token" type="password" placeholder="hf_..." style="width:100%"></label>
+            <label class="small">Remote URL (detector/humanizer, opcional): <input id="cfg_generic_url" placeholder="https://..." style="width:100%"></label>
+            <div style="display:flex;gap:8px"><button id="runEnsembleBtn">Ejecutar Ensemble</button><button id="runHumanizersBtn" class="secondary">Ejecutar Humanizadores</button></div>
+            <div id="ensembleOutput" class="small" style="white-space:pre-wrap;margin-top:8px;background:#fbfdff;padding:8px;border-radius:8px;border:1px solid #eef6ff"></div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('runEnsembleBtn').addEventListener('click', async ()=>{
+        const text = input.value || '';
+        if (!text) return alert('Pega texto en la izquierda.');
+        const cfg = {useLocal:true, openai:{key:document.getElementById('cfg_openai_key').value, model:null}, huggingface:{token:document.getElementById('cfg_hf_token').value, model:null}, generic:[]};
+        const genericUrl = document.getElementById('cfg_generic_url').value; if (genericUrl) cfg.generic.push({url:genericUrl,name:'user_generic'});
+        const out = await runEnsemble(text, cfg);
+        const panelOut = document.getElementById('ensembleOutput');
+        panelOut.textContent = 'Aggregate score: ' + (out.aggregate===null? 'N/A': out.aggregate + '%') + '\\n\\nDetails:\\n' + JSON.stringify(out.results, null, 2);
+      });
+
+      document.getElementById('runHumanizersBtn').addEventListener('click', async ()=>{
+        const text = input.value || '';
+        if (!text) return alert('Pega texto en la izquierda.');
+        const humanConfig = {localOptions:{synonyms:document.getElementById('optErrors').checked, colloq:document.getElementById('optColloq').checked, vary:document.getElementById('optVary').checked}, remotes:[]};
+        const genericUrl = document.getElementById('cfg_generic_url').value; if (genericUrl) humanConfig.remotes.push({url:genericUrl});
+        const humanized = await runHumanizers(text, humanConfig);
+        output.value = humanized;
+        alert('Humanizadores ejecutados. Revisa el resultado.');
+      });
+    })();
+
+    // ---------- UI: botones básicos ----------
+    btnHumanize.addEventListener('click', async ()=>{
+      const text = input.value || ''; if (!text) return alert('Ingresa texto.');
+      const conf = {localOptions:{synonyms:document.getElementById('optErrors').checked, colloq:document.getElementById('optColloq').checked, vary:document.getElementById('optVary').checked}};
+      output.value = await runHumanizers(text, conf);
+      saveHistory(text, output.value);
+    });
+
+    btnDetect.addEventListener('click', async ()=>{
+      const text = input.value || ''; if (!text) return alert('Ingresa texto.');
+      const cfg = {useLocal:true, openai:{key:document.getElementById('cfg_openai_key')?document.getElementById('cfg_openai_key').value:null, model:null}, huggingface:{token:document.getElementById('cfg_hf_token')?document.getElementById('cfg_hf_token').value:null, model:null}, generic:[]};
+      const genericUrl = document.getElementById('cfg_generic_url')?document.getElementById('cfg_generic_url').value:''; if (genericUrl) cfg.generic.push({url:genericUrl,name:'user_generic'});
+      const result = await runEnsemble(text, cfg);
+      const panelOut = document.getElementById('ensembleOutput');
+      panelOut.textContent = 'Aggregate score: ' + (result.aggregate===null? 'N/A': result.aggregate + '%') + '\\n\\nDetails:\\n' + JSON.stringify(result.results, null, 2);
+    });
+
+    btnClear.addEventListener('click', ()=>{ if (!confirm('Limpiar texto y resultados?')) return; input.value=''; output.value=''; document.getElementById('ensembleOutput').textContent=''; });
+
+    btnCopy.addEventListener('click', ()=>{ if (!output.value) return alert('No hay texto generado'); navigator.clipboard.writeText(output.value).then(()=>alert('Copiado al portapapeles')); });
+
+    btnDownloadTxt.addEventListener('click', ()=>{ if (!output.value) return alert('No hay texto generado'); downloadFile('texto_humanizado.txt', output.value); });
+
+    // ---------- Historial simple ----------
+    function saveHistory(orig, result){
+      try{
+        const key = 'humanizer_ensemble_history';
+        const h = JSON.parse(localStorage.getItem(key)||'[]');
+        h.unshift({date:new Date().toLocaleString(), preview:result.slice(0,120), original:orig, result});
+        if (h.length>20) h.pop();
+        localStorage.setItem(key, JSON.stringify(h));
+        renderHistory();
+      }catch(e){}
     }
     function renderHistory(){
-      const h = JSON.parse(localStorage.getItem('humanizerHistory')||'[]');
-      historyList.innerHTML = '';
-      if (!h.length) {historyList.innerHTML='<div class="small">No hay historial todavía.</div>'; return}
-      h.forEach(it=>{
-        const div=document.createElement('div'); div.className='history-item'; div.tabIndex=0;
-        div.textContent = it.preview + ' — ' + it.date; div.addEventListener('click', ()=>{ input.value = it.original; output.value = it.humanized; updateStats(it.humanized); });
-        historyList.appendChild(div);
-      })
+      try{
+        const key = 'humanizer_ensemble_history';
+        const h = JSON.parse(localStorage.getItem(key)||'[]');
+        historyList.innerHTML = '';
+        if (!h.length){ historyList.textContent='No hay historial.'; return; }
+        h.forEach(item=>{ const d=document.createElement('div'); d.className='small'; d.style.padding='6px'; d.style.borderBottom='1px solid #eef6ff'; d.textContent = item.date + ' — ' + item.preview; d.tabIndex=0; d.addEventListener('click', ()=>{ input.value=item.original; output.value=item.result; }); historyList.appendChild(d); });
+      }catch(e){ historyList.textContent='No hay historial.'; }
     }
     renderHistory();
 
-    // Worker inline: crea un web worker a partir de un blob para mantener todo en un archivo
-    const workerCode = `
-      // worker: recibe mensajes {cmd:'humanize'|'detect', text, options}
-      self.onmessage = function(e){
-        const data = e.data;
-        if (data.cmd==='humanize'){
-          // algoritmo simplificado: reemplazos + inserciones aleatorias
-          let s = data.text;
-          const repl = { 'utilizar':'usar','finalizar':'terminar','iniciar':'empezar','visualizar':'ver' };
-          for (let k in repl) s = s.split(k).join(repl[k]);
-          // insertar coloquialismos cada 6-9 oraciones
-          if (data.options.addColloq){
-            const colo = ['o sea','digamos','pues','mira','la verdad'];
-            const sentences = s.split(/(?<=[.!?])\s+/);
-            for (let i=5;i<sentences.length;i+=Math.floor(Math.random()*4)+6){ sentences[i] = colo[Math.floor(Math.random()*colo.length)] + ', ' + sentences[i]; }
-            s = sentences.join(' ');
-          }
-          // errores humanos
-          if (data.options.addErrors){ s = s.replace(/\bhaber\b/g,'a ver'); }
-          // variar estructura (dividir oraciones largas)
-          if (data.options.vary){ s = s.replace(/,\s+/g,',\n'); }
+    // ---------- Exponer API para integraciones ----------
+    window.detectorEnsemble = { runEnsemble, runHumanizers, localDetectorScore };
 
-          // simple métricas
-          const words = s.trim()? s.trim().split(/\s+/).length:0;
-          const readability = Math.max(0, Math.round(100 - (words/Math.max(1, (s.split(/[.!?]+/).length))) ));
-          const aiScore = Math.max(0, Math.round(50 - (Math.random()*20)));
-
-          self.postMessage({cmd:'result', humanized:s, words, readability, aiScore});
-        } else if (data.cmd==='detect'){
-          const text = data.text;
-          const words = text.trim()? text.trim().split(/\s+/).length:0;
-          const unique = new Set((text||'').split(/\s+/)).size;
-          const uniqRatio = words? unique/words:1;
-          const aiProb = Math.round(Math.max(0, Math.min(100, 50 + (1-uniqRatio)*60 + (words>400?10:0))));
-          self.postMessage({cmd:'detectResult', aiProb});
-        }
-      };
-    `;
-    const workerBlob = new Blob([workerCode], {type:'application/javascript'});
-    const worker = new Worker(URL.createObjectURL(workerBlob));
-
-    worker.onmessage = function(e){
-      const d = e.data;
-      if (d.cmd==='result'){
-        output.value = d.humanized;
-        updateStats(d.humanized, d.words, d.readability, d.aiScore);
-        progressFill.style.width = '100%';
-        saveHistory({date:new Date().toLocaleString(), original:input.value, humanized:d.humanized, preview:d.humanized.slice(0,80)});
-        btnHumanize.disabled = false;
-      } else if (d.cmd==='detectResult'){
-        aiProb.textContent = d.aiProb + '%';
-        aiProb.style.color = d.aiProb>70? '#b91c1c':(d.aiProb>40? '#b45309':'#047857');
-        progressFill.style.width = '0%';
-        btnDetect.disabled = false;
-      }
-    }
-
-    // funciones UI
-    function estimateReadability(text){
-      const sentences = text.split(/[.!?]+/).filter(Boolean).length || 1;
-      const words = text.split(/\s+/).filter(Boolean).length || 0;
-      const avg = words/sentences; return Math.max(0, Math.round(100 - avg));
-    }
-    function updateStats(text, wordsArg, readabilityArg, aiScoreArg){
-      const words = wordsArg|| (text.trim()? text.trim().split(/\s+/).length:0);
-      const readability = readabilityArg || estimateReadability(text);
-      wordCount.textContent = words;
-      readScore.textContent = readability;
-      if (typeof aiScoreArg !== 'undefined') aiProb.textContent = (100-aiScoreArg)+'%';
-    }
-
-    input.addEventListener('input', ()=>{ const words = input.value.trim()? input.value.trim().split(/\s+/).length:0; wordCount.textContent = words; progressFill.style.width='0%'; });
-
-    btnHumanize.addEventListener('click', ()=>{
-      const text = input.value.trim(); if (!text){ alert('Ingresa texto.'); return }
-      btnHumanize.disabled = true; progressFill.style.width='30%';
-      worker.postMessage({cmd:'humanize', text, options:{addErrors:document.getElementById('optErrors').checked, addColloq:document.getElementById('optColloq').checked, vary:document.getElementById('optVary').checked}});
-    });
-
-    btnDetect.addEventListener('click', ()=>{
-      const text = input.value.trim(); if (!text){ alert('Ingresa texto.'); return }
-      btnDetect.disabled = true; progressFill.style.width='60%';
-      worker.postMessage({cmd:'detect', text});
-    });
-
-    btnClear.addEventListener('click', ()=>{ input.value=''; output.value=''; wordCount.textContent='0'; readScore.textContent='0'; aiProb.textContent='—'; progressFill.style.width='0%'; });
-
-    // Descargas de código
-    downloadC.addEventListener('click', ()=> downloadFile('humanizer.c', cSource, 'text/x-c'));
-    downloadRust.addEventListener('click', ()=> downloadFile('lib.rs', rustSource, 'text/plain'));
-    downloadPy.addEventListener('click', ()=> downloadFile('humanizer.py', pySource, 'text/x-python'));
-
-    // Copiar y descargar txt
-    btnCopy.addEventListener('click', ()=>{ if (!output.value) return alert('No hay texto generado'); navigator.clipboard.writeText(output.value).then(()=> alert('Copiado al portapapeles')) });
-    btnDownloadTxt.addEventListener('click', ()=>{ if (!output.value) return alert('No hay texto generado'); downloadFile('texto_humanizado.txt', output.value, 'text/plain') });
-
-    // Inicializar estado
-    (function init(){ progressFill.style.width='0%'; aiProb.textContent='—'; renderHistory(); })();
-  </script></body>
+    // ÉTICA
+    console.info('Ensemble Detector inicializado. No usar para evadir sistemas de verificación ni para engañar.');
+  })();
+  </script>
+</body>
 </html>
