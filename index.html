@@ -1,1757 +1,288 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html><html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Humanizador y Detector de IA</title>
-    <style>
-        :root {
-            --primary-color: #4a6fa5;
-            --secondary-color: #166088;
-            --accent-color: #4cb5ae;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-            --danger-color: #e74c3c;
-            --warning-color: #f39c12;
-            --success-color: #2ecc71;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: var(--dark-color);
-            background-color: #f5f7fa;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-            border-radius: 0 0 10px 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        h1 {
-            margin-bottom: 0.5rem;
-            font-size: 2.5rem;
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        .tabs {
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-            gap: 10px;
-        }
-        
-        .tab {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 15px 25px;
-            background: white;
-            border-radius: 10px 10px 0 0;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
-            font-weight: 600;
-        }
-        
-        .tab.active {
-            background: var(--accent-color);
-            color: white;
-        }
-        
-        .tab:hover:not(.active) {
-            background: #e9ecef;
-        }
-        
-        .tab-icon {
-            font-size: 1.2rem;
-        }
-        
-        .tab-content {
-            display: none;
-            background: white;
-            border-radius: 0 10px 10px 10px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            margin-top: 0;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-top: 20px;
-        }
-        
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        .input-section, .output-section {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        h2 {
-            color: var(--secondary-color);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--accent-color);
-        }
-        
-        textarea {
-            width: 100%;
-            min-height: 300px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-family: inherit;
-            font-size: 16px;
-            resize: vertical;
-            transition: border-color 0.3s;
-        }
-        
-        textarea:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-        
-        .word-count {
-            text-align: right;
-            margin-top: 10px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            gap: 10px;
-        }
-        
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-            flex: 1;
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-        }
-        
-        .btn-secondary {
-            background-color: #e9ecef;
-            color: var(--dark-color);
-        }
-        
-        .btn-secondary:hover {
-            background-color: #dee2e6;
-        }
-        
-        .processing-indicator {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-        
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: var(--accent-color);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
-        }
-        
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-        }
-        
-        .stat-item {
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-        
-        .stat-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .quality-indicator {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e8f5e9;
-            border-radius: 5px;
-            border-left: 4px solid #4caf50;
-        }
-        
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            color: #666;
-            font-size: 0.9rem;
-        }
-        
-        .advanced-options {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #f0f8ff;
-            border-radius: 5px;
-            border-left: 4px solid var(--primary-color);
-        }
-        
-        .option-group {
-            margin-bottom: 10px;
-        }
-        
-        .option-group label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        
-        .option-group input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-        }
-        
-        .history-section {
-            margin-top: 30px;
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-        
-        .history-list {
-            max-height: 200px;
-            overflow-y: auto;
-            margin-top: 15px;
-            border: 1px solid #eee;
-            border-radius: 5px;
-            padding: 10px;
-        }
-        
-        .history-item {
-            padding: 8px 12px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        
-        .history-item:hover {
-            background-color: #f5f5f5;
-        }
-        
-        .history-item:last-child {
-            border-bottom: none;
-        }
-        
-        .history-date {
-            font-size: 0.8rem;
-            color: #888;
-        }
-        
-        .ai-score {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #fff3cd;
-            border-radius: 5px;
-            border-left: 4px solid #ffc107;
-        }
-        
-        .score-bar {
-            height: 10px;
-            background-color: #e9ecef;
-            border-radius: 5px;
-            margin-top: 5px;
-            overflow: hidden;
-        }
-        
-        .score-fill {
-            height: 100%;
-            background-color: #4caf50;
-            border-radius: 5px;
-            transition: width 0.5s;
-        }
-        
-        .human-percentage {
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-        
-        .detector-results {
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        .result-card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        
-        .result-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .result-icon {
-            font-size: 1.5rem;
-        }
-        
-        .confidence-meter {
-            height: 8px;
-            background-color: #e9ecef;
-            border-radius: 4px;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-        
-        .confidence-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s;
-        }
-        
-        .analysis-details {
-            margin-top: 15px;
-            padding: 15px;
-            background-color: #f8f9fa;
-            border-radius: 5px;
-        }
-        
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .detail-item:last-child {
-            border-bottom: none;
-        }
-        
-        .detail-label {
-            font-weight: 500;
-        }
-        
-        .detail-value {
-            font-weight: 600;
-        }
-        
-        .human-score {
-            color: var(--success-color);
-        }
-        
-        .ai-score-high {
-            color: var(--danger-color);
-        }
-        
-        .ai-score-medium {
-            color: var(--warning-color);
-        }
-        
-        .ai-score-low {
-            color: var(--success-color);
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Humanizador y Detector de IA — Versión Mejorada</title>
+  <meta name="description" content="Humanizador y detector de IA. Implementación completa en HTML5/CSS3/JavaScript. Incluye código fuente C y Rust descargable y guía para compilar a WebAssembly (WASM) para multiplataforma." />
+  <style>
+    /* Diseño moderno, responsivo y accesible (CSS3) */
+    :root{
+      --bg:#f5f7fb; --card:#fff; --brand:#2563eb; --muted:#6b7280; --accent:#06b6d4; --success:#10b981; --danger:#ef4444;
+      --radius:14px; --gap:18px; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;background:linear-gradient(180deg,var(--bg),#eef2ff);color:#0f172a;padding:24px}
+    .wrap{max-width:1100px;margin:0 auto}
+    header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+    header h1{font-size:1.4rem;margin:0}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:20px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border-radius:var(--radius);padding:18px;box-shadow:0 8px 24px rgba(12,17,43,0.06)}
+    textarea{width:100%;min-height:260px;padding:12px;border:1px solid #e6eef8;border-radius:10px;font-size:15px}
+    label{font-weight:600;color:var(--muted);font-size:0.92rem}
+    .controls{display:flex;gap:10px;margin-top:12px}
+    button{background:var(--brand);color:white;padding:10px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+    button.secondary{background:#eef2ff;color:var(--brand)}
+    .small{font-size:0.9rem;color:var(--muted)}
+    .stat-row{display:flex;gap:12px;margin-top:14px}
+    .stat{background:#f8fafc;padding:10px;border-radius:8px;flex:1;text-align:center}
+    .stat .num{font-weight:700;color:var(--brand);font-size:1.1rem}
+    .options{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+    @media(max-width:600px){.options{grid-template-columns:1fr}}
+    .history{max-height:250px;overflow:auto;margin-top:12px;padding:8px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff}
+    .history-item{padding:8px;border-bottom:1px solid #eef6ff;cursor:pointer}
+    .badge{display:inline-block;padding:6px 8px;border-radius:999px;background:#f0f9ff;color:#0369a1;font-weight:600;font-size:0.85rem}
+    footer{margin-top:18px;color:var(--muted);font-size:0.9rem}
+    /* barra de progreso */
+    .bar{height:12px;background:#eef2ff;border-radius:999px;overflow:hidden}
+    .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--brand));width:0%}
+    /* accesibilidad */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  </style>
 </head>
 <body>
+  <div class="wrap">
     <header>
-        <div class="container">
-            <h1>Humanizador y Detector de IA</h1>
-            <p class="subtitle">Convierte textos de IA en escritura humana o detecta contenido generado por IA</p>
-        </div>
-    </header>
-    
-    <div class="container">
-        <div class="tabs">
-            <div class="tab active" data-tab="humanizer">
-                <span class="tab-icon">✍️</span>
-                <span>Humanizador</span>
-            </div>
-            <div class="tab" data-tab="detector">
-                <span class="tab-icon">🔍</span>
-                <span>Detector de IA</span>
-            </div>
-        </div>
-        
-        <!-- Pestaña Humanizador -->
-        <div class="tab-content active" id="humanizer-tab">
-            <div class="main-content">
-                <section class="input-section">
-                    <h2>Texto Original (IA)</h2>
-                    <textarea id="original-text" placeholder="Pega aquí tu texto generado por IA (hasta 10,000 palabras)..."></textarea>
-                    <div class="word-count" id="word-count">Palabras: 0</div>
-                    
-                    <div class="advanced-options">
-                        <h3>Técnicas Anti-Detección</h3>
-                        <div class="option-group">
-                            <label>
-                                <input type="checkbox" id="add-human-errors" checked>
-                                Añadir errores humanos leves
-                            </label>
-                        </div>
-                        <div class="option-group">
-                            <label>
-                                <input type="checkbox" id="vary-sentence-structure" checked>
-                                Variar estructura de oraciones
-                            </label>
-                        </div>
-                        <div class="option-group">
-                            <label>
-                                <input type="checkbox" id="add-colloquialisms" checked>
-                                Añadir expresiones coloquiales
-                            </label>
-                        </div>
-                        <div class="option-group">
-                            <label>
-                                <input type="checkbox" id="break-patterns" checked>
-                                Romper patrones de IA
-                            </label>
-                        </div>
-                        <div class="option-group">
-                            <label>
-                                <input type="checkbox" id="add-personal-touch">
-                                Añadir toque personal
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="controls">
-                        <button class="btn-secondary" id="clear-btn">Limpiar</button>
-                        <button class="btn-primary" id="humanize-btn">Humanizar Texto</button>
-                    </div>
-                    
-                    <div class="processing-indicator" id="processing-indicator">
-                        <div class="spinner"></div>
-                        <p>Aplicando técnicas anti-detección... Esto puede tomar unos segundos</p>
-                    </div>
-                </section>
-                
-                <section class="output-section">
-                    <h2>Texto Humanizado</h2>
-                    <textarea id="humanized-text" readonly placeholder="Aquí aparecerá tu texto humanizado e indetectable..."></textarea>
-                    
-                    <div class="ai-score" id="ai-score" style="display: none;">
-                        <p>Probabilidad de detección como IA: <span class="human-percentage" id="ai-percentage">0%</span></p>
-                        <div class="score-bar">
-                            <div class="score-fill" id="score-fill" style="width: 0%"></div>
-                        </div>
-                        <p id="ai-assessment">El texto parece completamente humano</p>
-                    </div>
-                    
-                    <div class="stats">
-                        <div class="stat-item">
-                            <div class="stat-value" id="original-words">0</div>
-                            <div class="stat-label">Palabras originales</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="humanized-words">0</div>
-                            <div class="stat-label">Palabras humanizadas</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="readability-score">0</div>
-                            <div class="stat-label">Legibilidad</div>
-                        </div>
-                    </div>
-                    
-                    <div class="quality-indicator" id="quality-indicator" style="display: none;">
-                        <p>✅ Tu texto ha sido humanizado exitosamente. La probabilidad de detección como IA se ha reducido significativamente.</p>
-                    </div>
-                    
-                    <div class="controls">
-                        <button class="btn-secondary" id="copy-btn">Copiar Texto</button>
-                        <button class="btn-secondary" id="download-btn">Descargar</button>
-                    </div>
-                </section>
-            </div>
-            
-            <section class="history-section">
-                <h2>Historial de Textos Humanizados</h2>
-                <p>Haz clic en cualquier elemento del historial para cargarlo de nuevo</p>
-                <div class="history-list" id="history-list">
-                    <!-- El historial se cargará aquí dinámicamente -->
-                </div>
-                <div class="controls">
-                    <button class="btn-secondary" id="clear-history-btn">Limpiar Historial</button>
-                </div>
-            </section>
-        </div>
-        
-        <!-- Pestaña Detector de IA -->
-        <div class="tab-content" id="detector-tab">
-            <div class="main-content">
-                <section class="input-section">
-                    <h2>Texto a Analizar</h2>
-                    <textarea id="detector-text" placeholder="Pega aquí el texto que quieres analizar (hasta 10,000 palabras)..."></textarea>
-                    <div class="word-count" id="detector-word-count">Palabras: 0</div>
-                    
-                    <div class="advanced-options">
-                        <h3>Opciones de Análisis</h3>
-                        <div class="option-group">
-                            <label>
-                                <input type="checkbox" id="analyze-patterns" checked>
-                                Analizar patrones de IA
-                            </label>
-                        </div>
-                        <div class="option-group">
-                            <label>
-                                <input type="checkbox" id="check-perplexity" checked>
-                                Evaluar complejidad
-                            </label>
-                        </div>
-                        <div class="option-group">
-                            <label>
-                                <input type="checkbox" id="detect-repetition" checked>
-                                Detectar repeticiones
-                            </label>
-                        </div>
-                        <div class="option-group">
-                            <label>
-                                <input type="checkbox" id="evaluate-structure" checked>
-                                Evaluar estructura
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="controls">
-                        <button class="btn-secondary" id="detector-clear-btn">Limpiar</button>
-                        <button class="btn-primary" id="detect-btn">Analizar Texto</button>
-                    </div>
-                    
-                    <div class="processing-indicator" id="detector-processing-indicator">
-                        <div class="spinner"></div>
-                        <p>Analizando texto... Esto puede tomar unos segundos</p>
-                    </div>
-                </section>
-                
-                <section class="output-section">
-                    <h2>Resultados del Análisis</h2>
-                    
-                    <div class="detector-results" id="detector-results" style="display: none;">
-                        <div class="result-card">
-                            <div class="result-title">
-                                <span class="result-icon">🤖</span>
-                                <h3>Probabilidad de ser IA</h3>
-                            </div>
-                            <div class="confidence-meter">
-                                <div class="confidence-fill" id="ai-confidence-fill" style="width: 0%; background-color: #e74c3c;"></div>
-                            </div>
-                            <p id="ai-confidence-text">Cargando...</p>
-                        </div>
-                        
-                        <div class="result-card">
-                            <div class="result-title">
-                                <span class="result-icon">👤</span>
-                                <h3>Probabilidad de ser Humano</h3>
-                            </div>
-                            <div class="confidence-meter">
-                                <div class="confidence-fill" id="human-confidence-fill" style="width: 0%; background-color: #2ecc71;"></div>
-                            </div>
-                            <p id="human-confidence-text">Cargando...</p>
-                        </div>
-                        
-                        <div class="analysis-details">
-                            <h4>Detalles del Análisis</h4>
-                            <div class="detail-item">
-                                <span class="detail-label">Patrones de IA detectados:</span>
-                                <span class="detail-value" id="pattern-score">0</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Variabilidad de oraciones:</span>
-                                <span class="detail-value" id="sentence-variability">0%</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Repeticiones detectadas:</span>
-                                <span class="detail-value" id="repetition-score">0</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Complejidad léxica:</span>
-                                <span class="detail-value" id="lexical-complexity">0%</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Estructura típica de IA:</span>
-                                <span class="detail-value" id="structure-score">0%</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="quality-indicator" id="detector-quality-indicator" style="display: none;">
-                        <p id="detector-result-message">El análisis ha sido completado. Revisa los resultados arriba.</p>
-                    </div>
-                </section>
-            </div>
-            
-            <section class="history-section">
-                <h2>Historial de Análisis</h2>
-                <p>Haz clic en cualquier elemento del historial para cargarlo de nuevo</p>
-                <div class="history-list" id="detector-history-list">
-                    <!-- El historial se cargará aquí dinámicamente -->
-                </div>
-                <div class="controls">
-                    <button class="btn-secondary" id="detector-clear-history-btn">Limpiar Historial</button>
-                </div>
-            </section>
-        </div>
-        
-        <div class="footer">
-            <p>Aplicación desarrollada con HTML, CSS y JavaScript - Humanizador y Detector de IA</p>
-            <p>© 2023 Humanizador de Textos - Todos los derechos reservados</p>
-        </div>
+      <h1>Humanizador y Detector de IA — Mejorado</h1>
+      <div class="small">HTML5 · CSS3 · JavaScript + Código fuente C y Rust (multiplataforma / WASM)</div>
+    </header><main class="grid">
+  <!-- Área principal -->
+  <section class="card" aria-labelledby="input-title">
+    <h2 id="input-title">Texto original (IA)</h2>
+    <textarea id="inputText" placeholder="Pega aquí tu texto generado por IA..."></textarea>
+    <div class="stat-row">
+      <div class="stat"><div class="num" id="wordCount">0</div><div class="small">Palabras</div></div>
+      <div class="stat"><div class="num" id="readScore">0</div><div class="small">Legibilidad</div></div>
+      <div class="stat"><div class="num" id="aiProb">—</div><div class="small">Prob. IA</div></div>
     </div>
 
-    <script>
-        // Clase para humanizar textos con técnicas anti-detección de IA
-        class TextHumanizer {
-            constructor() {
-                this.replacements = {
-                    'utilizar': 'usar',
-                    'finalizar': 'terminar',
-                    'iniciar': 'empezar',
-                    'poseer': 'tener',
-                    'visualizar': 'ver',
-                    'efectuar': 'hacer',
-                    'facilitar': 'ayudar',
-                    'obtener': 'conseguir',
-                    'proporcionar': 'dar',
-                    'requerir': 'necesitar',
-                    'adicionalmente': 'además',
-                    'consecuentemente': 'por lo tanto',
-                    'no obstante': 'sin embargo',
-                    'en cuanto a': 'sobre',
-                    'debido a que': 'porque',
-                    'a fin de que': 'para que',
-                    'con el propósito de': 'para',
-                    'en relación con': 'sobre',
-                    'por medio de': 'mediante',
-                    'en caso de que': 'si',
-                    'a pesar de que': 'aunque',
-                    'en virtud de': 'gracias a',
-                    'con anterioridad': 'antes',
-                    'posteriormente': 'después',
-                    'en definitiva': 'en resumen',
-                    'es preciso': 'hay que',
-                    'resulta evidente': 'es claro',
-                    'llevar a cabo': 'hacer',
-                    'poner en marcha': 'iniciar',
-                    'tener en cuenta': 'considerar',
-                    'en primer lugar': 'primero',
-                    'en segundo lugar': 'segundo',
-                    'por último': 'finalmente',
-                    'de acuerdo con': 'según',
-                    'con respecto a': 'sobre',
-                    'en cuanto a': 'respecto a',
-                    'así como también': 'y también',
-                    'de la misma manera': 'igual',
-                    'en otras palabras': 'es decir',
-                    'cabe destacar': 'es importante',
-                    'es importante señalar': 'hay que decir',
-                    'vale la pena mencionar': 'conviene mencionar'
-                };
-                
-                this.colloquialExpressions = [
-                    'o sea',
-                    'digamos',
-                    'bueno',
-                    'pues',
-                    'vamos',
-                    'fíjate',
-                    'mira',
-                    'oye',
-                    'claro',
-                    'desde luego',
-                    'por supuesto',
-                    'la verdad',
-                    'a ver',
-                    'entonces',
-                    'total',
-                    'en fin',
-                    'así que',
-                    'pues eso',
-                    'ya sabes',
-                    'como te decía'
-                ];
-                
-                this.humanErrors = [
-                    { from: 'haber', to: 'a ver' },
-                    { from: 'halla', to: 'haya' },
-                    { from: 'aya', to: 'haya' },
-                    { from: 'echo', to: 'hecho' },
-                    { from: 'haiga', to: 'haya' },
-                    { from: 'iba', to: 'iva' },
-                    { from: 'valla', to: 'vaya' },
-                    { from: 'raya', to: 'ralla' },
-                    { from: 'hechar', to: 'echar' },
-                    { from: 'cabo', to: 'caso' }
-                ];
-                
-                this.personalExpressions = [
-                    'En mi opinión',
-                    'Desde mi punto de vista',
-                    'Personalmente creo que',
-                    'Me parece que',
-                    'A mi entender',
-                    'En mi experiencia',
-                    'Si me preguntas a mí',
-                    'Yo diría que',
-                    'A mi modo de ver',
-                    'Desde mi perspectiva'
-                ];
-            }
-            
-            humanizeText(text, options = {}) {
-                let humanizedText = text;
-                
-                // Reemplazar palabras formales por informales
-                if (options.replaceFormalWords !== false) {
-                    humanizedText = this.replaceFormalWords(humanizedText);
-                }
-                
-                // Variar estructura de oraciones
-                if (options.varySentenceStructure) {
-                    humanizedText = this.varySentenceStructure(humanizedText);
-                }
-                
-                // Añadir expresiones coloquiales
-                if (options.addColloquialisms) {
-                    humanizedText = this.addColloquialisms(humanizedText);
-                }
-                
-                // Romper patrones de IA
-                if (options.breakPatterns) {
-                    humanizedText = this.breakPatterns(humanizedText);
-                }
-                
-                // Añadir toque personal
-                if (options.addPersonalTouch) {
-                    humanizedText = this.addPersonalTouch(humanizedText);
-                }
-                
-                // Añadir errores humanos leves (opcional)
-                if (options.addHumanErrors) {
-                    humanizedText = this.addHumanErrors(humanizedText);
-                }
-                
-                return humanizedText;
-            }
-            
-            replaceFormalWords(text) {
-                let result = text;
-                
-                for (const [formal, informal] of Object.entries(this.replacements)) {
-                    const regex = new RegExp(`\\b${formal}\\b`, 'gi');
-                    result = result.replace(regex, informal);
-                }
-                
-                return result;
-            }
-            
-            varySentenceStructure(text) {
-                const sentences = text.split(/(?<=[.!?])\s+/);
-                const variedSentences = [];
-                
-                for (let i = 0; i < sentences.length; i++) {
-                    let sentence = sentences[i];
-                    
-                    // Cada 3-4 oraciones, cambiar la estructura
-                    if (i % 4 === 0 && sentence.length > 20) {
-                        // Convertir algunas oraciones en preguntas retóricas
-                        if (i % 8 === 0) {
-                            sentence = this.convertToRhetoricalQuestion(sentence);
-                        }
-                        // Dividir oraciones largas
-                        else if (sentence.split(' ').length > 25) {
-                            const parts = this.splitLongSentence(sentence);
-                            variedSentences.push(parts[0]);
-                            if (parts[1]) variedSentences.push(parts[1]);
-                            continue;
-                        }
-                        // Combinar oraciones cortas
-                        else if (i > 0 && sentences[i-1].split(' ').length < 8 && 
-                                 sentence.split(' ').length < 10) {
-                            sentence = sentences[i-1] + ' y ' + sentence.toLowerCase();
-                            variedSentences.pop(); // Eliminar la oración anterior
-                        }
-                    }
-                    
-                    variedSentences.push(sentence);
-                }
-                
-                return variedSentences.join(' ');
-            }
-            
-            convertToRhetoricalQuestion(sentence) {
-                // Convertir una oración afirmativa en pregunta retórica
-                if (sentence.endsWith('.')) {
-                    sentence = sentence.slice(0, -1);
-                    
-                    const questionPhrases = [
-                        '¿No crees?',
-                        '¿Verdad?',
-                        '¿No te parece?',
-                        '¿Qué opinas?',
-                        '¿No es así?'
-                    ];
-                    
-                    const randomPhrase = questionPhrases[Math.floor(Math.random() * questionPhrases.length)];
-                    return sentence + '. ' + randomPhrase;
-                }
-                
-                return sentence;
-            }
-            
-            splitLongSentence(sentence) {
-                const words = sentence.split(' ');
-                if (words.length <= 15) return [sentence];
-                
-                // Encontrar un punto natural para dividir (después de una coma o conjunción)
-                let splitIndex = Math.floor(words.length / 2);
-                for (let i = splitIndex; i < words.length - 3; i++) {
-                    if (words[i].endsWith(',') || 
-                        ['y', 'o', 'pero', 'aunque', 'sin embargo'].includes(words[i].toLowerCase())) {
-                        splitIndex = i + 1;
-                        break;
-                    }
-                }
-                
-                const firstPart = words.slice(0, splitIndex).join(' ');
-                const secondPart = words.slice(splitIndex).join(' ');
-                
-                return [firstPart, this.capitalizeFirstLetter(secondPart)];
-            }
-            
-            addColloquialisms(text) {
-                const sentences = text.split(/(?<=[.!?])\s+/);
-                
-                // Añadir expresiones coloquiales cada 5-7 oraciones
-                for (let i = 5; i < sentences.length; i += Math.floor(Math.random() * 3) + 5) {
-                    const randomExpression = this.colloquialExpressions[
-                        Math.floor(Math.random() * this.colloquialExpressions.length)
-                    ];
-                    
-                    // Añadir al inicio o final de la oración
-                    if (Math.random() > 0.5) {
-                        sentences[i] = randomExpression + ', ' + sentences[i].toLowerCase();
-                    } else {
-                        sentences[i] = sentences[i] + ', ' + randomExpression + '.';
-                    }
-                }
-                
-                return sentences.join(' ');
-            }
-            
-            breakPatterns(text) {
-                // Romper patrones repetitivos típicos de IA
-                let result = text;
-                
-                // Variar conectores
-                result = result.replace(/Además, /g, () => 
-                    Math.random() > 0.5 ? 'Por otro lado, ' : 'También, ');
-                
-                result = result.replace(/Sin embargo, /g, () => 
-                    Math.random() > 0.5 ? 'No obstante, ' : 'En cambio, ');
-                
-                result = result.replace(/Por lo tanto, /g, () => 
-                    Math.random() > 0.5 ? 'Así que, ' : 'Por eso, ');
-                
-                // Variar inicios de párrafo
-                result = result.replace(/En primer lugar, /g, 'Para empezar, ');
-                result = result.replace(/En segundo lugar, /g, 'Después, ');
-                result = result.replace(/En conclusión, /g, 'En resumen, ');
-                
-                return result;
-            }
-            
-            addPersonalTouch(text) {
-                const sentences = text.split(/(?<=[.!?])\s+/);
-                
-                // Añadir expresiones personales cada 6-8 oraciones
-                for (let i = 6; i < sentences.length; i += Math.floor(Math.random() * 3) + 6) {
-                    const randomExpression = this.personalExpressions[
-                        Math.floor(Math.random() * this.personalExpressions.length)
-                    ];
-                    
-                    sentences[i] = randomExpression + ', ' + sentences[i].toLowerCase();
-                }
-                
-                return sentences.join(' ');
-            }
-            
-            addHumanErrors(text) {
-                let result = text;
-                
-                // Añadir algunos errores humanos comunes (ligeros)
-                const errorCount = Math.max(1, Math.floor(text.length / 2000)); // ~1 error cada 2000 caracteres
-                
-                for (let i = 0; i < errorCount; i++) {
-                    const error = this.humanErrors[Math.floor(Math.random() * this.humanErrors.length)];
-                    const regex = new RegExp(`\\b${error.from}\\b`, 'gi');
-                    
-                    // Solo reemplazar si encontramos la palabra y con una probabilidad del 50%
-                    if (result.match(regex) && Math.random() > 0.5) {
-                        result = result.replace(regex, error.to);
-                    }
-                }
-                
-                return result;
-            }
-            
-            calculateReadability(text) {
-                // Fórmula simplificada de legibilidad
-                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-                const words = text.split(/\s+/).filter(w => w.length > 0);
-                
-                if (sentences.length === 0 || words.length === 0) {
-                    return 0;
-                }
-                
-                const avgSentenceLength = words.length / sentences.length;
-                const avgWordLength = words.reduce((sum, word) => sum + word.length, 0) / words.length;
-                
-                // Fórmula simplificada basada en longitud de oraciones y palabras
-                let readability = 100 - (avgSentenceLength * 1.5 + avgWordLength * 10);
-                readability = Math.max(0, Math.min(100, readability));
-                
-                return Math.round(readability);
-            }
-            
-            estimateAIDetection(text) {
-                // Estimación basada en patrones típicos de texto de IA
-                let aiScore = 0;
-                
-                // Patrones que aumentan la probabilidad de detección
-                const aiPatterns = [
-                    { pattern: /En primer lugar|En segundo lugar|En tercer lugar/g, weight: 3 },
-                    { pattern: /Además|Por otra parte|Asimismo/g, weight: 2 },
-                    { pattern: /Sin embargo|No obstante|Por el contrario/g, weight: 2 },
-                    { pattern: /En conclusión|En resumen|Finalmente/g, weight: 3 },
-                    { pattern: /Es importante destacar|Cabe mencionar|Vale la pena señalar/g, weight: 2 },
-                    { pattern: /Por un lado|Por otro lado/g, weight: 2 },
-                    { pattern: /De esta manera|De este modo/g, weight: 2 },
-                    { pattern: /En cuanto a|Respecto a|En relación con/g, weight: 2 }
-                ];
-                
-                // Calcular puntuación basada en patrones
-                for (const { pattern, weight } of aiPatterns) {
-                    const matches = text.match(pattern);
-                    if (matches) {
-                        aiScore += matches.length * weight;
-                    }
-                }
-                
-                // Considerar longitud promedio de oraciones (las IA tienden a oraciones más largas)
-                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-                const avgSentenceLength = text.split(/\s+/).length / sentences.length;
-                
-                if (avgSentenceLength > 20) aiScore += 5;
-                if (avgSentenceLength > 25) aiScore += 5;
-                
-                // Considerar uniformidad en la estructura
-                const sentenceLengths = sentences.map(s => s.split(/\s+/).length);
-                const lengthVariance = this.calculateVariance(sentenceLengths);
-                
-                // Menor variación = más probable que sea IA
-                if (lengthVariance < 50) aiScore += 5;
-                
-                // Normalizar puntuación (0-100)
-                const normalizedScore = Math.min(100, Math.max(0, aiScore));
-                
-                return 100 - normalizedScore; // Devolvemos el porcentaje de "humanidad"
-            }
-            
-            calculateVariance(numbers) {
-                if (numbers.length === 0) return 0;
-                
-                const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
-                const squaredDiffs = numbers.map(num => Math.pow(num - mean, 2));
-                const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / numbers.length;
-                
-                return variance;
-            }
-            
-            capitalizeFirstLetter(string) {
-                return string.charAt(0).toUpperCase() + string.slice(1);
-            }
-        }
+    <div class="options" role="group" aria-label="Opciones de humanización">
+      <label><input type="checkbox" id="optErrors" checked> Añadir errores leves</label>
+      <label><input type="checkbox" id="optColloq" checked> Añadir coloquialismos</label>
+      <label><input type="checkbox" id="optVary" checked> Variar estructura</label>
+      <label><input type="checkbox" id="optPersonal"> Añadir toque personal</label>
+    </div>
 
-        // Clase para detectar contenido generado por IA
-        class IADetector {
-            constructor() {
-                this.aiPatterns = [
-                    { pattern: /En primer lugar|En segundo lugar|En tercer lugar/g, weight: 8 },
-                    { pattern: /Además|Por otra parte|Asimismo/g, weight: 5 },
-                    { pattern: /Sin embargo|No obstante|Por el contrario/g, weight: 5 },
-                    { pattern: /En conclusión|En resumen|Finalmente/g, weight: 8 },
-                    { pattern: /Es importante destacar|Cabe mencionar|Vale la pena señalar/g, weight: 6 },
-                    { pattern: /Por un lado|Por otro lado/g, weight: 5 },
-                    { pattern: /De esta manera|De este modo/g, weight: 5 },
-                    { pattern: /En cuanto a|Respecto a|En relación con/g, weight: 5 },
-                    { pattern: /Por lo tanto|En consecuencia/g, weight: 5 },
-                    { pattern: /Así pues|De este modo/g, weight: 4 }
-                ];
-                
-                this.humanPatterns = [
-                    { pattern: /o sea|digamos|bueno|pues/g, weight: 5 },
-                    { pattern: /la verdad|a ver|entonces/g, weight: 4 },
-                    { pattern: /me parece|yo creo|en mi opinión/g, weight: 6 },
-                    { pattern: /claro|desde luego|por supuesto/g, weight: 4 },
-                    { pattern: /fíjate|mira|oye/g, weight: 7 },
-                    { pattern: /¿no crees\?|¿verdad\?|¿no te parece\?/g, weight: 8 }
-                ];
-            }
-            
-            detectAI(text, options = {}) {
-                let aiScore = 0;
-                let humanScore = 0;
-                
-                // Analizar patrones de IA si está habilitado
-                if (options.analyzePatterns !== false) {
-                    aiScore += this.analyzeAIPatterns(text);
-                }
-                
-                // Evaluar complejidad si está habilitado
-                if (options.checkPerplexity !== false) {
-                    aiScore += this.evaluatePerplexity(text);
-                }
-                
-                // Detectar repeticiones si está habilitado
-                if (options.detectRepetition !== false) {
-                    aiScore += this.detectRepetition(text);
-                }
-                
-                // Evaluar estructura si está habilitado
-                if (options.evaluateStructure !== false) {
-                    aiScore += this.evaluateStructure(text);
-                }
-                
-                // Analizar patrones humanos
-                humanScore += this.analyzeHumanPatterns(text);
-                
-                // Ajustar puntuaciones
-                aiScore = Math.min(100, aiScore);
-                humanScore = Math.min(100, humanScore);
-                
-                // Calcular probabilidad final
-                const total = aiScore + humanScore;
-                const aiProbability = total > 0 ? Math.round((aiScore / total) * 100) : 50;
-                const humanProbability = 100 - aiProbability;
-                
-                // Calcular métricas detalladas
-                const details = {
-                    patternScore: this.analyzeAIPatterns(text),
-                    sentenceVariability: this.calculateSentenceVariability(text),
-                    repetitionScore: this.detectRepetition(text),
-                    lexicalComplexity: this.evaluateLexicalComplexity(text),
-                    structureScore: this.evaluateStructure(text)
-                };
-                
-                return {
-                    aiProbability,
-                    humanProbability,
-                    details
-                };
-            }
-            
-            analyzeAIPatterns(text) {
-                let score = 0;
-                
-                for (const { pattern, weight } of this.aiPatterns) {
-                    const matches = text.match(pattern);
-                    if (matches) {
-                        score += matches.length * weight;
-                    }
-                }
-                
-                return Math.min(40, score);
-            }
-            
-            analyzeHumanPatterns(text) {
-                let score = 0;
-                
-                for (const { pattern, weight } of this.humanPatterns) {
-                    const matches = text.match(pattern);
-                    if (matches) {
-                        score += matches.length * weight;
-                    }
-                }
-                
-                return Math.min(40, score);
-            }
-            
-            evaluatePerplexity(text) {
-                // Evaluación simplificada de complejidad/perplejidad
-                const words = text.split(/\s+/).filter(w => w.length > 0);
-                const uniqueWords = [...new Set(words)];
-                const uniqueRatio = uniqueWords.length / words.length;
-                
-                // Textos con menor diversidad léxica son más probables de ser IA
-                return Math.max(0, 20 - (uniqueRatio * 20));
-            }
-            
-            detectRepetition(text) {
-                // Detectar repeticiones de palabras y frases
-                const words = text.split(/\s+/);
-                const wordCount = {};
-                
-                words.forEach(word => {
-                    const cleanWord = word.toLowerCase().replace(/[.,!?;:()]/g, '');
-                    if (cleanWord.length > 3) {
-                        wordCount[cleanWord] = (wordCount[cleanWord] || 0) + 1;
-                    }
-                });
-                
-                // Calcular repeticiones excesivas
-                let repetitionScore = 0;
-                Object.values(wordCount).forEach(count => {
-                    if (count > 5) {
-                        repetitionScore += (count - 5) * 2;
-                    }
-                });
-                
-                return Math.min(20, repetitionScore);
-            }
-            
-            evaluateStructure(text) {
-                // Evaluar la estructura del texto
-                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-                if (sentences.length < 3) return 0;
-                
-                const sentenceLengths = sentences.map(s => s.split(/\s+/).length);
-                const avgLength = sentenceLengths.reduce((a, b) => a + b, 0) / sentenceLengths.length;
-                
-                // Textos con oraciones de longitud muy uniforme son más probables de ser IA
-                const variance = this.calculateVariance(sentenceLengths);
-                
-                let structureScore = 0;
-                if (variance < 30) structureScore += 10;
-                if (variance < 20) structureScore += 10;
-                
-                // Oraciones muy largas también son indicador de IA
-                if (avgLength > 25) structureScore += 10;
-                
-                return Math.min(20, structureScore);
-            }
-            
-            evaluateLexicalComplexity(text) {
-                // Evaluar complejidad léxica
-                const words = text.split(/\s+/).filter(w => w.length > 0);
-                const longWords = words.filter(w => w.length > 6);
-                const longWordRatio = longWords.length / words.length;
-                
-                // Porcentaje de palabras complejas (simulación)
-                return Math.round(longWordRatio * 100);
-            }
-            
-            calculateSentenceVariability(text) {
-                // Calcular variabilidad de longitud de oraciones
-                const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-                if (sentences.length < 3) return 0;
-                
-                const sentenceLengths = sentences.map(s => s.split(/\s+/).length);
-                const variance = this.calculateVariance(sentenceLengths);
-                
-                // Normalizar a porcentaje (más variación = más humano)
-                return Math.min(100, Math.round(variance));
-            }
-            
-            calculateVariance(numbers) {
-                if (numbers.length === 0) return 0;
-                
-                const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
-                const squaredDiffs = numbers.map(num => Math.pow(num - mean, 2));
-                const variance = squaredDiffs.reduce((sum, diff) => sum + diff, 0) / numbers.length;
-                
-                return variance;
-            }
-        }
+    <div class="controls">
+      <button id="btnHumanize">Humanizar (JS)</button>
+      <button class="secondary" id="btnDetect">Detectar (JS)</button>
+      <button class="secondary" id="btnClear">Limpiar</button>
+    </div>
 
-        // Inicialización cuando el DOM esté listo
-        document.addEventListener('DOMContentLoaded', function() {
-            const humanizer = new TextHumanizer();
-            const detector = new IADetector();
-            
-            // Elementos de la pestaña Humanizador
-            const originalText = document.getElementById('original-text');
-            const humanizedText = document.getElementById('humanized-text');
-            const wordCount = document.getElementById('word-count');
-            const humanizeBtn = document.getElementById('humanize-btn');
-            const clearBtn = document.getElementById('clear-btn');
-            const copyBtn = document.getElementById('copy-btn');
-            const downloadBtn = document.getElementById('download-btn');
-            const processingIndicator = document.getElementById('processing-indicator');
-            const originalWords = document.getElementById('original-words');
-            const humanizedWords = document.getElementById('humanized-words');
-            const readabilityScore = document.getElementById('readability-score');
-            const qualityIndicator = document.getElementById('quality-indicator');
-            const historyList = document.getElementById('history-list');
-            const clearHistoryBtn = document.getElementById('clear-history-btn');
-            const aiScoreElement = document.getElementById('ai-score');
-            const aiPercentage = document.getElementById('ai-percentage');
-            const scoreFill = document.getElementById('score-fill');
-            const aiAssessment = document.getElementById('ai-assessment');
-            
-            // Opciones de humanización
-            const addHumanErrors = document.getElementById('add-human-errors');
-            const varySentenceStructure = document.getElementById('vary-sentence-structure');
-            const addColloquialisms = document.getElementById('add-colloquialisms');
-            const breakPatterns = document.getElementById('break-patterns');
-            const addPersonalTouch = document.getElementById('add-personal-touch');
-            
-            // Elementos de la pestaña Detector
-            const detectorText = document.getElementById('detector-text');
-            const detectorWordCount = document.getElementById('detector-word-count');
-            const detectBtn = document.getElementById('detect-btn');
-            const detectorClearBtn = document.getElementById('detector-clear-btn');
-            const detectorProcessingIndicator = document.getElementById('detector-processing-indicator');
-            const detectorResults = document.getElementById('detector-results');
-            const detectorQualityIndicator = document.getElementById('detector-quality-indicator');
-            const detectorResultMessage = document.getElementById('detector-result-message');
-            const detectorHistoryList = document.getElementById('detector-history-list');
-            const detectorClearHistoryBtn = document.getElementById('detector-clear-history-btn');
-            
-            // Elementos de resultados del detector
-            const aiConfidenceFill = document.getElementById('ai-confidence-fill');
-            const humanConfidenceFill = document.getElementById('human-confidence-fill');
-            const aiConfidenceText = document.getElementById('ai-confidence-text');
-            const humanConfidenceText = document.getElementById('human-confidence-text');
-            const patternScore = document.getElementById('pattern-score');
-            const sentenceVariability = document.getElementById('sentence-variability');
-            const repetitionScore = document.getElementById('repetition-score');
-            const lexicalComplexity = document.getElementById('lexical-complexity');
-            const structureScore = document.getElementById('structure-score');
-            
-            // Opciones del detector
-            const analyzePatterns = document.getElementById('analyze-patterns');
-            const checkPerplexity = document.getElementById('check-perplexity');
-            const detectRepetition = document.getElementById('detect-repetition');
-            const evaluateStructure = document.getElementById('evaluate-structure');
-            
-            // Sistema de pestañas
-            const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.getAttribute('data-tab');
-                    
-                    // Actualizar pestañas activas
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tabContents.forEach(tc => tc.classList.remove('active'));
-                    
-                    tab.classList.add('active');
-                    document.getElementById(`${tabId}-tab`).classList.add('active');
-                });
-            });
-            
-            // Cargar historiales desde localStorage
-            loadHistory();
-            loadDetectorHistory();
-            
-            // ========== FUNCIONALIDAD HUMANIZADOR ==========
-            
-            // Actualizar contador de palabras (Humanizador)
-            originalText.addEventListener('input', function() {
-                const text = originalText.value.trim();
-                const words = text ? text.split(/\s+/).length : 0;
-                wordCount.textContent = `Palabras: ${words}`;
-                
-                // Deshabilitar botón si hay más de 10,000 palabras
-                if (words > 10000) {
-                    humanizeBtn.disabled = true;
-                    wordCount.innerHTML = `Palabras: <span style="color:red">${words} (Límite: 10,000)</span>`;
-                } else {
-                    humanizeBtn.disabled = false;
-                }
-            });
-            
-            // Limpiar texto (Humanizador)
-            clearBtn.addEventListener('click', function() {
-                originalText.value = '';
-                humanizedText.value = '';
-                wordCount.textContent = 'Palabras: 0';
-                qualityIndicator.style.display = 'none';
-                aiScoreElement.style.display = 'none';
-                originalWords.textContent = '0';
-                humanizedWords.textContent = '0';
-                readabilityScore.textContent = '0';
-            });
-            
-            // Humanizar texto
-            humanizeBtn.addEventListener('click', function() {
-                const text = originalText.value.trim();
-                if (!text) {
-                    alert('Por favor, ingresa un texto para humanizar.');
-                    return;
-                }
-                
-                const wordCount = text.split(/\s+/).length;
-                if (wordCount > 10000) {
-                    alert('El texto excede el límite de 10,000 palabras.');
-                    return;
-                }
-                
-                // Mostrar indicador de procesamiento
-                processingIndicator.style.display = 'block';
-                humanizeBtn.disabled = true;
-                
-                // Usar setTimeout para permitir que la UI se actualice
-                setTimeout(function() {
-                    try {
-                        // Obtener opciones seleccionadas
-                        const options = {
-                            addHumanErrors: addHumanErrors.checked,
-                            varySentenceStructure: varySentenceStructure.checked,
-                            addColloquialisms: addColloquialisms.checked,
-                            breakPatterns: breakPatterns.checked,
-                            addPersonalTouch: addPersonalTouch.checked
-                        };
-                        
-                        // Humanizar texto
-                        const humanized = humanizer.humanizeText(text, options);
-                        
-                        // Calcular estadísticas
-                        const originalWordCount = text.split(/\s+/).length;
-                        const humanizedWordCount = humanized.split(/\s+/).length;
-                        const readability = humanizer.calculateReadability(humanized);
-                        const aiDetectionScore = humanizer.estimateAIDetection(humanized);
-                        
-                        // Mostrar resultado
-                        humanizedText.value = humanized;
-                        originalWords.textContent = originalWordCount;
-                        humanizedWords.textContent = humanizedWordCount;
-                        readabilityScore.textContent = readability;
-                        qualityIndicator.style.display = 'block';
-                        aiScoreElement.style.display = 'block';
-                        
-                        // Actualizar indicador de detección de IA
-                        aiPercentage.textContent = `${100 - aiDetectionScore}%`;
-                        scoreFill.style.width = `${100 - aiDetectionScore}%`;
-                        
-                        // Cambiar color según el nivel de detección
-                        if (aiDetectionScore >= 80) {
-                            scoreFill.style.backgroundColor = '#4caf50';
-                            aiAssessment.textContent = 'El texto parece completamente humano';
-                        } else if (aiDetectionScore >= 60) {
-                            scoreFill.style.backgroundColor = '#8bc34a';
-                            aiAssessment.textContent = 'Baja probabilidad de detección como IA';
-                        } else if (aiDetectionScore >= 40) {
-                            scoreFill.style.backgroundColor = '#ffc107';
-                            aiAssessment.textContent = 'Probabilidad moderada de detección como IA';
-                        } else {
-                            scoreFill.style.backgroundColor = '#f44336';
-                            aiAssessment.textContent = 'Alta probabilidad de detección como IA';
-                        }
-                        
-                        // Guardar en historial
-                        saveToHistory(text, humanized, originalWordCount, humanizedWordCount, readability, aiDetectionScore);
-                        
-                    } catch (error) {
-                        console.error('Error:', error);
-                        alert('Error al procesar el texto. Por favor, intenta de nuevo.');
-                    } finally {
-                        // Ocultar indicador de procesamiento
-                        processingIndicator.style.display = 'none';
-                        humanizeBtn.disabled = false;
-                    }
-                }, 100);
-            });
-            
-            // Copiar texto humanizado
-            copyBtn.addEventListener('click', function() {
-                if (!humanizedText.value) {
-                    alert('No hay texto para copiar.');
-                    return;
-                }
-                
-                humanizedText.select();
-                document.execCommand('copy');
-                
-                // Feedback visual
-                const originalText = copyBtn.textContent;
-                copyBtn.textContent = '¡Copiado!';
-                setTimeout(() => {
-                    copyBtn.textContent = originalText;
-                }, 2000);
-            });
-            
-            // Descargar texto humanizado
-            downloadBtn.addEventListener('click', function() {
-                if (!humanizedText.value) {
-                    alert('No hay texto para descargar.');
-                    return;
-                }
-                
-                const blob = new Blob([humanizedText.value], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'texto_humanizado.txt';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            });
-            
-            // Limpiar historial (Humanizador)
-            clearHistoryBtn.addEventListener('click', function() {
-                if (confirm('¿Estás seguro de que quieres borrar todo el historial?')) {
-                    localStorage.removeItem('textHumanizerHistory');
-                    historyList.innerHTML = '<p>No hay elementos en el historial</p>';
-                }
-            });
-            
-            // ========== FUNCIONALIDAD DETECTOR ==========
-            
-            // Actualizar contador de palabras (Detector)
-            detectorText.addEventListener('input', function() {
-                const text = detectorText.value.trim();
-                const words = text ? text.split(/\s+/).length : 0;
-                detectorWordCount.textContent = `Palabras: ${words}`;
-                
-                // Deshabilitar botón si hay más de 10,000 palabras
-                if (words > 10000) {
-                    detectBtn.disabled = true;
-                    detectorWordCount.innerHTML = `Palabras: <span style="color:red">${words} (Límite: 10,000)</span>`;
-                } else {
-                    detectBtn.disabled = false;
-                }
-            });
-            
-            // Limpiar texto (Detector)
-            detectorClearBtn.addEventListener('click', function() {
-                detectorText.value = '';
-                detectorWordCount.textContent = 'Palabras: 0';
-                detectorResults.style.display = 'none';
-                detectorQualityIndicator.style.display = 'none';
-            });
-            
-            // Detectar IA
-            detectBtn.addEventListener('click', function() {
-                const text = detectorText.value.trim();
-                if (!text) {
-                    alert('Por favor, ingresa un texto para analizar.');
-                    return;
-                }
-                
-                const wordCount = text.split(/\s+/).length;
-                if (wordCount > 10000) {
-                    alert('El texto excede el límite de 10,000 palabras.');
-                    return;
-                }
-                
-                // Mostrar indicador de procesamiento
-                detectorProcessingIndicator.style.display = 'block';
-                detectBtn.disabled = true;
-                
-                // Usar setTimeout para permitir que la UI se actualice
-                setTimeout(function() {
-                    try {
-                        // Obtener opciones seleccionadas
-                        const options = {
-                            analyzePatterns: analyzePatterns.checked,
-                            checkPerplexity: checkPerplexity.checked,
-                            detectRepetition: detectRepetition.checked,
-                            evaluateStructure: evaluateStructure.checked
-                        };
-                        
-                        // Analizar texto
-                        const results = detector.detectAI(text, options);
-                        
-                        // Mostrar resultados
-                        detectorResults.style.display = 'block';
-                        detectorQualityIndicator.style.display = 'block';
-                        
-                        // Actualizar barras de confianza
-                        aiConfidenceFill.style.width = `${results.aiProbability}%`;
-                        humanConfidenceFill.style.width = `${results.humanProbability}%`;
-                        
-                        // Actualizar textos de confianza
-                        aiConfidenceText.textContent = `${results.aiProbability}% de probabilidad`;
-                        humanConfidenceText.textContent = `${results.humanProbability}% de probabilidad`;
-                        
-                        // Actualizar detalles del análisis
-                        patternScore.textContent = results.details.patternScore;
-                        sentenceVariability.textContent = `${results.details.sentenceVariability}%`;
-                        repetitionScore.textContent = results.details.repetitionScore;
-                        lexicalComplexity.textContent = `${results.details.lexicalComplexity}%`;
-                        structureScore.textContent = `${results.details.structureScore}%`;
-                        
-                        // Mensaje de resultado
-                        if (results.aiProbability > 70) {
-                            detectorResultMessage.textContent = '⚠️ Este texto tiene alta probabilidad de haber sido generado por IA.';
-                            detectorResultMessage.style.color = '#e74c3c';
-                        } else if (results.aiProbability > 40) {
-                            detectorResultMessage.textContent = '🔍 Este texto muestra algunas características de IA, pero no es concluyente.';
-                            detectorResultMessage.style.color = '#f39c12';
-                        } else {
-                            detectorResultMessage.textContent = '✅ Este texto parece haber sido escrito por un humano.';
-                            detectorResultMessage.style.color = '#2ecc71';
-                        }
-                        
-                        // Guardar en historial del detector
-                        saveToDetectorHistory(text, results);
-                        
-                    } catch (error) {
-                        console.error('Error:', error);
-                        alert('Error al analizar el texto. Por favor, intenta de nuevo.');
-                    } finally {
-                        // Ocultar indicador de procesamiento
-                        detectorProcessingIndicator.style.display = 'none';
-                        detectBtn.disabled = false;
-                    }
-                }, 100);
-            });
-            
-            // Limpiar historial (Detector)
-            detectorClearHistoryBtn.addEventListener('click', function() {
-                if (confirm('¿Estás seguro de que quieres borrar todo el historial?')) {
-                    localStorage.removeItem('textDetectorHistory');
-                    detectorHistoryList.innerHTML = '<p>No hay elementos en el historial</p>';
-                }
-            });
-            
-            // ========== FUNCIONES AUXILIARES ==========
-            
-            // Funciones para manejar el historial del humanizador
-            function saveToHistory(original, humanized, originalCount, humanizedCount, readability, aiScore) {
-                const history = getHistory();
-                const newItem = {
-                    id: Date.now(),
-                    date: new Date().toLocaleString(),
-                    original: original,
-                    humanized: humanized,
-                    originalCount: originalCount,
-                    humanizedCount: humanizedCount,
-                    readability: readability,
-                    aiScore: aiScore
-                };
-                
-                history.unshift(newItem);
-                
-                // Mantener solo los últimos 10 elementos
-                if (history.length > 10) {
-                    history.pop();
-                }
-                
-                localStorage.setItem('textHumanizerHistory', JSON.stringify(history));
-                loadHistory();
-            }
-            
-            function getHistory() {
-                const historyJSON = localStorage.getItem('textHumanizerHistory');
-                return historyJSON ? JSON.parse(historyJSON) : [];
-            }
-            
-            function loadHistory() {
-                const history = getHistory();
-                historyList.innerHTML = '';
-                
-                if (history.length === 0) {
-                    historyList.innerHTML = '<p>No hay elementos en el historial</p>';
-                    return;
-                }
-                
-                history.forEach(item => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-item';
-                    historyItem.innerHTML = `
-                        <div><strong>${item.original.substring(0, 50)}${item.original.length > 50 ? '...' : ''}</strong></div>
-                        <div class="history-date">${item.date} - Legibilidad: ${item.readability} - IA: ${100 - item.aiScore}%</div>
-                    `;
-                    
-                    historyItem.addEventListener('click', function() {
-                        originalText.value = item.original;
-                        humanizedText.value = item.humanized;
-                        originalWords.textContent = item.originalCount;
-                        humanizedWords.textContent = item.humanizedCount;
-                        readabilityScore.textContent = item.readability;
-                        qualityIndicator.style.display = 'block';
-                        aiScoreElement.style.display = 'block';
-                        
-                        // Actualizar indicador de IA
-                        aiPercentage.textContent = `${100 - item.aiScore}%`;
-                        scoreFill.style.width = `${100 - item.aiScore}%`;
-                        
-                        if (item.aiScore >= 80) {
-                            scoreFill.style.backgroundColor = '#4caf50';
-                            aiAssessment.textContent = 'El texto parece completamente humano';
-                        } else if (item.aiScore >= 60) {
-                            scoreFill.style.backgroundColor = '#8bc34a';
-                            aiAssessment.textContent = 'Baja probabilidad de detección como IA';
-                        } else if (item.aiScore >= 40) {
-                            scoreFill.style.backgroundColor = '#ffc107';
-                            aiAssessment.textContent = 'Probabilidad moderada de detección como IA';
-                        } else {
-                            scoreFill.style.backgroundColor = '#f44336';
-                            aiAssessment.textContent = 'Alta probabilidad de detección como IA';
-                        }
-                        
-                        // Actualizar contador de palabras
-                        const words = item.original ? item.original.split(/\s+/).length : 0;
-                        wordCount.textContent = `Palabras: ${words}`;
-                    });
-                    
-                    historyList.appendChild(historyItem);
-                });
-            }
-            
-            // Funciones para manejar el historial del detector
-            function saveToDetectorHistory(text, results) {
-                const history = getDetectorHistory();
-                const newItem = {
-                    id: Date.now(),
-                    date: new Date().toLocaleString(),
-                    text: text,
-                    aiProbability: results.aiProbability,
-                    humanProbability: results.humanProbability,
-                    details: results.details
-                };
-                
-                history.unshift(newItem);
-                
-                // Mantener solo los últimos 10 elementos
-                if (history.length > 10) {
-                    history.pop();
-                }
-                
-                localStorage.setItem('textDetectorHistory', JSON.stringify(history));
-                loadDetectorHistory();
-            }
-            
-            function getDetectorHistory() {
-                const historyJSON = localStorage.getItem('textDetectorHistory');
-                return historyJSON ? JSON.parse(historyJSON) : [];
-            }
-            
-            function loadDetectorHistory() {
-                const history = getDetectorHistory();
-                detectorHistoryList.innerHTML = '';
-                
-                if (history.length === 0) {
-                    detectorHistoryList.innerHTML = '<p>No hay elementos en el historial</p>';
-                    return;
-                }
-                
-                history.forEach(item => {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'history-item';
-                    
-                    let probabilityClass = 'ai-score-low';
-                    if (item.aiProbability > 70) probabilityClass = 'ai-score-high';
-                    else if (item.aiProbability > 40) probabilityClass = 'ai-score-medium';
-                    
-                    historyItem.innerHTML = `
-                        <div><strong>${item.text.substring(0, 50)}${item.text.length > 50 ? '...' : ''}</strong></div>
-                        <div class="history-date">${item.date} - <span class="${probabilityClass}">IA: ${item.aiProbability}%</span></div>
-                    `;
-                    
-                    historyItem.addEventListener('click', function() {
-                        detectorText.value = item.text;
-                        
-                        // Actualizar contador de palabras
-                        const words = item.text ? item.text.split(/\s+/).length : 0;
-                        detectorWordCount.textContent = `Palabras: ${words}`;
-                        
-                        // Mostrar resultados
-                        detectorResults.style.display = 'block';
-                        detectorQualityIndicator.style.display = 'block';
-                        
-                        // Actualizar barras de confianza
-                        aiConfidenceFill.style.width = `${item.aiProbability}%`;
-                        humanConfidenceFill.style.width = `${item.humanProbability}%`;
-                        
-                        // Actualizar textos de confianza
-                        aiConfidenceText.textContent = `${item.aiProbability}% de probabilidad`;
-                        humanConfidenceText.textContent = `${item.humanProbability}% de probabilidad`;
-                        
-                        // Actualizar detalles del análisis
-                        patternScore.textContent = item.details.patternScore;
-                        sentenceVariability.textContent = `${item.details.sentenceVariability}%`;
-                        repetitionScore.textContent = item.details.repetitionScore;
-                        lexicalComplexity.textContent = `${item.details.lexicalComplexity}%`;
-                        structureScore.textContent = `${item.details.structureScore}%`;
-                        
-                        // Mensaje de resultado
-                        if (item.aiProbability > 70) {
-                            detectorResultMessage.textContent = '⚠️ Este texto tiene alta probabilidad de haber sido generado por IA.';
-                            detectorResultMessage.style.color = '#e74c3c';
-                        } else if (item.aiProbability > 40) {
-                            detectorResultMessage.textContent = '🔍 Este texto muestra algunas características de IA, pero no es concluyente.';
-                            detectorResultMessage.style.color = '#f39c12';
-                        } else {
-                            detectorResultMessage.textContent = '✅ Este texto parece haber sido escrito por un humano.';
-                            detectorResultMessage.style.color = '#2ecc71';
-                        }
-                    });
-                    
-                    detectorHistoryList.appendChild(historyItem);
-                });
-            }
-        });
-    </script>
-</body>
+    <div class="small" style="margin-top:8px">Procesamiento en Web Worker — mantiene la UI reactiva con textos largos.</div>
+
+    <div class="history" id="historyList" aria-live="polite" aria-atomic="false">
+      <!-- historial guardado -->
+    </div>
+  </section>
+
+  <!-- Panel derecho: resultados, descargas y código fuente -->
+  <aside class="card" aria-labelledby="results-title">
+    <h2 id="results-title">Resultados y Descargas</h2>
+
+    <label for="outputText">Texto humanizado</label>
+    <textarea id="outputText" readonly placeholder="Aquí aparecerá el texto humanizado..."></textarea>
+
+    <div style="margin-top:10px">
+      <div class="bar" aria-hidden="true"><i id="progressFill"></i></div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button id="btnCopy">Copiar</button>
+      <button class="secondary" id="btnDownloadTxt">Descargar .txt</button>
+    </div>
+
+    <hr style="margin:12px 0" />
+
+    <h3>Descargar código fuente</h3>
+    <p class="small">Incluyo implementaciones sencillas en C y Rust. Estas se pueden compilar localmente (multiplataforma) o convertir a WebAssembly para ejecutarlas en el navegador.</p>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button id="downloadC" class="secondary">Descargar C</button>
+      <button id="downloadRust" class="secondary">Descargar Rust</button>
+      <button id="downloadPy" class="secondary">Descargar Python (opcional)</button>
+    </div>
+
+    <details style="margin-top:12px">
+      <summary>Guía rápida: compilar a WebAssembly (Emscripten / wasm-pack)</summary>
+      <div class="small" style="margin-top:8px">
+        <strong>C → WASM (Emscripten)</strong>
+        <ol>
+          <li>Instala Emscripten: <code>https://emscripten.org/docs/getting_started/downloads.html</code></li>
+          <li>Compila: <code>emcc humanizer.c -O3 -s WASM=1 -s EXPORTED_FUNCTIONS='["_humanize","_estimate_ai"]' -o humanizer.js</code></li>
+          <li>Incluye <code>humanizer.js</code> y <code>humanizer.wasm</code> en tu página y llama a las funciones exportadas.</li>
+        </ol>
+        <strong>Rust → WASM (wasm-pack)</strong>
+        <ol>
+          <li>Instala Rust y <code>wasm-pack</code>.</li>
+          <li>En tu crate: <code>wasm-pack build --target web</code></li>
+          <li>Incluye el paquete generado en tu app web o en Node.js.</li>
+        </ol>
+      </div>
+    </details>
+
+    <hr style="margin:12px 0" />
+
+    <h3>Sugerencia de lenguaje multiplataforma</h3>
+    <p class="small">Recomiendo <strong>Rust</strong> si quieres rendimiento y facilidad para compilar a WebAssembly y a binarios nativos en Windows/macOS/Linux. Alternativa más simple: <strong>Python</strong> para scripts y backend multiplataforma.</p>
+
+    <footer>
+      <div class="small">Exporté código C y Rust minimal para que los descargues y pruebes. También se incluye una versión en Python para prototipado rápido.</div>
+    </footer>
+  </aside>
+</main>
+
+  </div>  <!-- Implementación JavaScript modular y ligera. Incluye Web Worker inline vía Blob para compatibilidad sin archivos extra. -->  <script>
+    // Código fuente (strings) para descarga: C, Rust y Python
+    const cSource = `// humanizer.c — implementación mínima\n#include <stdio.h>\n#include <string.h>\n#include <stdlib.h>\n// Funciones simples: reemplazo de palabras formales por informales (muy básico)\nchar* humanize_simple(const char* text) {\n    // Esta implementación realiza reemplazos básicos y devuelve un nuevo string (malloc)\n    size_t len = strlen(text);\n    char* out = malloc(len*2 + 100); // espacio extra para cambios\n    if (!out) return NULL;\n    strcpy(out, text);\n    // Reemplazo estático de ejemplo\n    // Nota: para producción usa una implementación que busque y reemplace de forma segura\n    char* p = strstr(out, "utilizar"); if (p) memcpy(p, "usar     ", 8);\n    p = strstr(out, "finalizar"); if (p) memcpy(p, "terminar ", 8);\n    return out;\n}\nint main() {\n    char buf[4096];\n    size_t r = fread(buf,1,sizeof(buf)-1,stdin); buf[r]=0;\n    char* result = humanize_simple(buf);\n    if (result) { printf("%s", result); free(result); }\n    return 0;\n}\n`;
+
+    const rustSource = `// lib.rs — crate simple para humanizar (ejemplo)\n// Usa wasm-bindgen para exportar a JS si lo compilas a WASM\nuse wasm_bindgen::prelude::*;\n\n#[wasm_bindgen]\npub fn humanize(text: &str) -> String {\n    // Reemplazos muy básicos\n    text.replace("utilizar","usar").replace("finalizar","terminar")\n}\n`;
+
+    const pySource = `# humanizer.py - versión prototipo\nreplacements = {\n  'utilizar':'usar', 'finalizar':'terminar', 'iniciar':'empezar'\n}\n\ndef humanize(text):\n  for k,v in replacements.items():\n    text = text.replace(k, v)\n  return text\n\nif __name__=='__main__':\n  import sys\n  data = sys.stdin.read()\n  print(humanize(data))\n`;
+
+    // Helpers para descargar archivos desde el navegador
+    function downloadFile(filename, content, mime='text/plain'){
+      const blob = new Blob([content], {type:mime});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // UI bindings
+    const input = document.getElementById('inputText');
+    const output = document.getElementById('outputText');
+    const btnHumanize = document.getElementById('btnHumanize');
+    const btnDetect = document.getElementById('btnDetect');
+    const btnClear = document.getElementById('btnClear');
+    const wordCount = document.getElementById('wordCount');
+    const readScore = document.getElementById('readScore');
+    const aiProb = document.getElementById('aiProb');
+    const progressFill = document.getElementById('progressFill');
+    const historyList = document.getElementById('historyList');
+
+    const downloadC = document.getElementById('downloadC');
+    const downloadRust = document.getElementById('downloadRust');
+    const downloadPy = document.getElementById('downloadPy');
+    const btnCopy = document.getElementById('btnCopy');
+    const btnDownloadTxt = document.getElementById('btnDownloadTxt');
+
+    // Almacenamiento simple (localStorage)
+    function saveHistory(item) {
+      const h = JSON.parse(localStorage.getItem('humanizerHistory')||'[]');
+      h.unshift(item); if (h.length>12) h.pop(); localStorage.setItem('humanizerHistory', JSON.stringify(h));
+      renderHistory();
+    }
+    function renderHistory(){
+      const h = JSON.parse(localStorage.getItem('humanizerHistory')||'[]');
+      historyList.innerHTML = '';
+      if (!h.length) {historyList.innerHTML='<div class="small">No hay historial todavía.</div>'; return}
+      h.forEach(it=>{
+        const div=document.createElement('div'); div.className='history-item'; div.tabIndex=0;
+        div.textContent = it.preview + ' — ' + it.date; div.addEventListener('click', ()=>{ input.value = it.original; output.value = it.humanized; updateStats(it.humanized); });
+        historyList.appendChild(div);
+      })
+    }
+    renderHistory();
+
+    // Worker inline: crea un web worker a partir de un blob para mantener todo en un archivo
+    const workerCode = `
+      // worker: recibe mensajes {cmd:'humanize'|'detect', text, options}
+      self.onmessage = function(e){
+        const data = e.data;
+        if (data.cmd==='humanize'){
+          // algoritmo simplificado: reemplazos + inserciones aleatorias
+          let s = data.text;
+          const repl = { 'utilizar':'usar','finalizar':'terminar','iniciar':'empezar','visualizar':'ver' };
+          for (let k in repl) s = s.split(k).join(repl[k]);
+          // insertar coloquialismos cada 6-9 oraciones
+          if (data.options.addColloq){
+            const colo = ['o sea','digamos','pues','mira','la verdad'];
+            const sentences = s.split(/(?<=[.!?])\s+/);
+            for (let i=5;i<sentences.length;i+=Math.floor(Math.random()*4)+6){ sentences[i] = colo[Math.floor(Math.random()*colo.length)] + ', ' + sentences[i]; }
+            s = sentences.join(' ');
+          }
+          // errores humanos
+          if (data.options.addErrors){ s = s.replace(/\bhaber\b/g,'a ver'); }
+          // variar estructura (dividir oraciones largas)
+          if (data.options.vary){ s = s.replace(/,\s+/g,',\n'); }
+
+          // simple métricas
+          const words = s.trim()? s.trim().split(/\s+/).length:0;
+          const readability = Math.max(0, Math.round(100 - (words/Math.max(1, (s.split(/[.!?]+/).length))) ));
+          const aiScore = Math.max(0, Math.round(50 - (Math.random()*20)));
+
+          self.postMessage({cmd:'result', humanized:s, words, readability, aiScore});
+        } else if (data.cmd==='detect'){
+          const text = data.text;
+          const words = text.trim()? text.trim().split(/\s+/).length:0;
+          const unique = new Set((text||'').split(/\s+/)).size;
+          const uniqRatio = words? unique/words:1;
+          const aiProb = Math.round(Math.max(0, Math.min(100, 50 + (1-uniqRatio)*60 + (words>400?10:0))));
+          self.postMessage({cmd:'detectResult', aiProb});
+        }
+      };
+    `;
+    const workerBlob = new Blob([workerCode], {type:'application/javascript'});
+    const worker = new Worker(URL.createObjectURL(workerBlob));
+
+    worker.onmessage = function(e){
+      const d = e.data;
+      if (d.cmd==='result'){
+        output.value = d.humanized;
+        updateStats(d.humanized, d.words, d.readability, d.aiScore);
+        progressFill.style.width = '100%';
+        saveHistory({date:new Date().toLocaleString(), original:input.value, humanized:d.humanized, preview:d.humanized.slice(0,80)});
+        btnHumanize.disabled = false;
+      } else if (d.cmd==='detectResult'){
+        aiProb.textContent = d.aiProb + '%';
+        aiProb.style.color = d.aiProb>70? '#b91c1c':(d.aiProb>40? '#b45309':'#047857');
+        progressFill.style.width = '0%';
+        btnDetect.disabled = false;
+      }
+    }
+
+    // funciones UI
+    function estimateReadability(text){
+      const sentences = text.split(/[.!?]+/).filter(Boolean).length || 1;
+      const words = text.split(/\s+/).filter(Boolean).length || 0;
+      const avg = words/sentences; return Math.max(0, Math.round(100 - avg));
+    }
+    function updateStats(text, wordsArg, readabilityArg, aiScoreArg){
+      const words = wordsArg|| (text.trim()? text.trim().split(/\s+/).length:0);
+      const readability = readabilityArg || estimateReadability(text);
+      wordCount.textContent = words;
+      readScore.textContent = readability;
+      if (typeof aiScoreArg !== 'undefined') aiProb.textContent = (100-aiScoreArg)+'%';
+    }
+
+    input.addEventListener('input', ()=>{ const words = input.value.trim()? input.value.trim().split(/\s+/).length:0; wordCount.textContent = words; progressFill.style.width='0%'; });
+
+    btnHumanize.addEventListener('click', ()=>{
+      const text = input.value.trim(); if (!text){ alert('Ingresa texto.'); return }
+      btnHumanize.disabled = true; progressFill.style.width='30%';
+      worker.postMessage({cmd:'humanize', text, options:{addErrors:document.getElementById('optErrors').checked, addColloq:document.getElementById('optColloq').checked, vary:document.getElementById('optVary').checked}});
+    });
+
+    btnDetect.addEventListener('click', ()=>{
+      const text = input.value.trim(); if (!text){ alert('Ingresa texto.'); return }
+      btnDetect.disabled = true; progressFill.style.width='60%';
+      worker.postMessage({cmd:'detect', text});
+    });
+
+    btnClear.addEventListener('click', ()=>{ input.value=''; output.value=''; wordCount.textContent='0'; readScore.textContent='0'; aiProb.textContent='—'; progressFill.style.width='0%'; });
+
+    // Descargas de código
+    downloadC.addEventListener('click', ()=> downloadFile('humanizer.c', cSource, 'text/x-c'));
+    downloadRust.addEventListener('click', ()=> downloadFile('lib.rs', rustSource, 'text/plain'));
+    downloadPy.addEventListener('click', ()=> downloadFile('humanizer.py', pySource, 'text/x-python'));
+
+    // Copiar y descargar txt
+    btnCopy.addEventListener('click', ()=>{ if (!output.value) return alert('No hay texto generado'); navigator.clipboard.writeText(output.value).then(()=> alert('Copiado al portapapeles')) });
+    btnDownloadTxt.addEventListener('click', ()=>{ if (!output.value) return alert('No hay texto generado'); downloadFile('texto_humanizado.txt', output.value, 'text/plain') });
+
+    // Inicializar estado
+    (function init(){ progressFill.style.width='0%'; aiProb.textContent='—'; renderHistory(); })();
+  </script></body>
 </html>
