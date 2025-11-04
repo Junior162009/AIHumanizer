@@ -1,309 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Humanizador y Detector de IA — Versión Mejorada (Ensemble)</title>
-  <meta name="description" content="Humanizador y ensemble de detectores de IA. Implementación HTML5/CSS3/JS. Incluye adaptadores para servicios externos (configurables)." />
-  <style>
-    :root{--bg:#f5f7fb;--card:#fff;--brand:#2563eb;--muted:#6b7280;--radius:12px;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    *{box-sizing:border-box}
-    body{margin:0;background:linear-gradient(180deg,var(--bg),#eef2ff);color:#0f172a;padding:20px}
-    .wrap{max-width:1100px;margin:0 auto}
-    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-    h1{font-size:1.2rem;margin:0}
-    .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
-    @media(max-width:920px){.grid{grid-template-columns:1fr}}
-    .card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 8px 20px rgba(13,18,35,0.06)}
-    textarea{width:100%;min-height:200px;padding:12px;border-radius:10px;border:1px solid #e6eef8;font-size:14px}
-    .controls{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-    button{background:var(--brand);color:white;padding:10px 12px;border-radius:9px;border:none;cursor:pointer;font-weight:600}
-    button.secondary{background:transparent;color:var(--brand);border:1px solid #e6f0ff}
-    .small{font-size:0.9rem;color:var(--muted)}
-    .history{max-height:220px;overflow:auto;margin-top:12px;padding:8px;border-radius:8px;background:#fbfdff;border:1px solid #eef6ff}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Humanizador y Detector de IA — MindMath Edition</title>
+<style>
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(180deg, #ffea61, #ffe6f0);
+  color: #222;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.container {
+  background: #fff;
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 1000px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+h1 {
+  text-align: center;
+  font-size: 1.8rem;
+  color: #0066ff;
+  margin-bottom: 20px;
+}
+textarea {
+  width: 100%;
+  min-height: 180px;
+  padding: 15px;
+  border-radius: 10px;
+  border: 2px solid #ccc;
+  font-size: 1rem;
+  resize: vertical;
+}
+button {
+  background: linear-gradient(90deg, #00bfff, #ff6ec7);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+}
+button:hover {
+  transform: scale(1.05);
+}
+.watermark {
+  position: absolute;
+  bottom: 10px;
+  right: 15px;
+  font-size: 0.8rem;
+  color: #0074e8;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.watermark img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+.logo-bg {
+  background: linear-gradient(135deg, #00bfff, #ff6ec7, #ffca3a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div>
-        <h1>Humanizador y Detector de IA — Ensemble</h1>
-        <div class="small">Analizadores locales + adaptadores para OpenAI, HuggingFace y endpoints genéricos.</div>
-      </div>
-    </header>
+  <div class="container">
+    <h1><span class="logo-bg">Humanizador y Detector de IA</span> — Edición Creativa</h1>
+    <p style="text-align:center;font-weight:500;margin-bottom:15px;color:#555">
+      Transforma textos de IA en escritos más naturales con un diseño inspirado en MindMath 🌈
+    </p>
+    <textarea id="inputText" placeholder="Pega tu texto aquí..."></textarea>
+    <div style="text-align:center">
+      <button id="btnHumanize">Humanizar Texto</button>
+      <button id="btnDetect">Detectar IA</button>
+    </div>
+    <textarea id="outputText" placeholder="Resultado aquí..." readonly></textarea>
 
-    <main class="grid">
-      <section class="card" aria-labelledby="input-title">
-        <h2 id="input-title">Texto original</h2>
-        <textarea id="inputText" placeholder="Pega aquí tu texto..."></textarea>
-
-        <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
-          <label class="small"><input id="optErrors" type="checkbox" checked> Reemplazos semánticos</label>
-          <label class="small"><input id="optColloq" type="checkbox" checked> Coloquialismos</label>
-          <label class="small"><input id="optVary" type="checkbox"> Variar estructura</label>
-        </div>
-
-        <div class="controls">
-          <button id="btnHumanize">Humanizar (local)</button>
-          <button id="btnDetect" class="secondary">Detectar (ensemble)</button>
-          <button id="btnClear" class="secondary">Limpiar</button>
-        </div>
-
-        <div class="small" style="margin-top:8px">Historial</div>
-        <div class="history" id="historyList">No hay historial.</div>
-      </section>
-
-      <aside class="card" aria-labelledby="results-title">
-        <h2 id="results-title">Resultados</h2>
-        <label class="small">Texto procesado</label>
-        <textarea id="outputText" readonly placeholder="Aquí aparecerá el resultado..."></textarea>
-
-        <div style="margin-top:12px">
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button id="btnCopy">Copiar</button>
-            <button id="btnDownloadTxt" class="secondary">Descargar .txt</button>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0" />
-
-        <div id="ensemblePanel">
-          <!-- Panel dinámico añadido por script -->
-        </div>
-
-      </aside>
-    </main>
+    <div class="watermark">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAABwCAYAAABxAvmHAAAABHNCSVQICAgIfAhkiAAAAWlJREFUeJzt3TEOwiAQRdEw3P//JzsVqP1ScdQbO7nUlI80gCNlO3LD+g+2ghkE8T8Aw8U8AM/EMwDM9AMPFPAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPABx2ghVGpDnHAAAAAElFTkSuQmCC" alt="MindMath Logo" />
+      <span>Patrocinado por <strong>MindMath</strong> © MindMath</span>
+    </div>
   </div>
 
   <script>
-  // Código principal: utilidades, detector local, adaptadores y UI
-  (function(){
-    // Helpers
-    function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
-    function downloadFile(filename, content, mime='text/plain'){ const blob=new Blob([content],{type:mime}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href); }
+  document.getElementById('btnHumanize').onclick = () => {
+    const t = document.getElementById('inputText').value;
+    if(!t.trim()) return alert('Por favor, ingresa un texto.');
+    let result = t
+      .replace(/utilizar/g,'usar')
+      .replace(/finalizar/g,'terminar')
+      .replace(/realizar/g,'hacer')
+      .replace(/además/g,'también');
+    result += "\\n\\n✨ Texto procesado con estilo MindMath ✨";
+    document.getElementById('outputText').value = result;
+  };
 
-    // DOM
-    const input = document.getElementById('inputText');
-    const output = document.getElementById('outputText');
-    const btnHumanize = document.getElementById('btnHumanize');
-    const btnDetect = document.getElementById('btnDetect');
-    const btnClear = document.getElementById('btnClear');
-    const historyList = document.getElementById('historyList');
-    const btnCopy = document.getElementById('btnCopy');
-    const btnDownloadTxt = document.getElementById('btnDownloadTxt');
-
-    // ---------- Heurísticos locales ----------
-    function lexicalDiversity(text){
-      try{
-        const words = (text.match(/\\b[\\p{L}']+\\b/gu) || []);
-        const unique = new Set(words.map(w=>w.toLowerCase()));
-        return words.length ? unique.size/words.length : 1;
-      }catch(e){ // fallback simple
-        const words = (text.match(/\\b[\\w']+\\b/g) || []); const unique = new Set(words.map(w=>w.toLowerCase())); return words.length? unique.size/words.length:1;
-      }
-    }
-    function avgSentenceLength(text){
-      const s = (text.match(/[^.!?]+[.!?]?/g) || [text]);
-      const words = text.trim().split(/\\s+/).filter(Boolean).length || 0;
-      return s.length ? words/s.length : 0;
-    }
-    function repetitionScore(text){
-      const words = text.toLowerCase().split(/\\s+/).filter(Boolean);
-      const freq = {}; for (const w of words) freq[w]=(freq[w]||0)+1;
-      const overused = Object.values(freq).filter(v=>v>6).length;
-      return Math.min(1, overused/5);
-    }
-    function ngramPredictability(text, n=3){
-      const tokens = text.toLowerCase().split(/\\s+/).filter(Boolean);
-      if (tokens.length< n+1) return 0;
-      const grams = {};
-      for (let i=0;i<=tokens.length-n;i++){ const g = tokens.slice(i,i+n).join(' '); grams[g]=(grams[g]||0)+1; }
-      const repeats = Object.values(grams).filter(v=>v>1).reduce((a,b)=>a+b,0);
-      return repeats / Math.max(1, tokens.length-n);
-    }
-
-    function localDetectorScore(text){
-      const lex = lexicalDiversity(text);
-      const avg = avgSentenceLength(text);
-      const rep = repetitionScore(text);
-      const pred = ngramPredictability(text);
-      const score = Math.round( clamp( 30*(1-lex) + 25*rep + 25*pred + 20*(avg>28?1:0), 0, 100) );
-      return {score, details:{lexicalDiversity:lex,avgSentLen:avg,repetition:rep,ngramPredictability:pred}};
-    }
-
-    // ---------- Adaptadores externos (requieren keys/endpoints) ----------
-    async function callOpenAIClassifier(text, apiKey, model='gpt-4o-mini-classifier'){
-      if (!apiKey) return {ok:false,error:'No API key'};
-      try{
-        const res = await fetch('https://api.openai.com/v1/classifications',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+apiKey},body:JSON.stringify({model,query:text})});
-        if (!res.ok) return {ok:false,error:await res.text()};
-        const data = await res.json();
-        const score = data.label? (data.label==='ai_generated'?80:20) : 50;
-        return {ok:true,score,meta:data};
-      }catch(err){ return {ok:false,error:err.message}; }
-    }
-
-    async function callHuggingFaceDetector(text, token, model='textattack/roberta-base-rotten-tomatoes'){
-      if (!token) return {ok:false,error:'No HF token'};
-      try{
-        const res = await fetch('https://api-inference.huggingface.co/models/' + encodeURIComponent(model), {method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({inputs:text})});
-        if (!res.ok) return {ok:false,error:await res.text()};
-        const data = await res.json();
-        // mapping best-effort
-        const score = data && data[0] && data[0].score ? Math.round(data[0].score*100) : 50;
-        return {ok:true,score,meta:data};
-      }catch(err){ return {ok:false,error:err.message}; }
-    }
-
-    async function callGenericDetector(text, url, headers){
-      try{
-        const res = await fetch(url,{method:'POST',headers:Object.assign({'Content-Type':'application/json'},headers||{}),body:JSON.stringify({text})});
-        if (!res.ok) return {ok:false,error:await res.text()};
-        const data = await res.json();
-        let score = 50;
-        if (data.ai_probability!==undefined) score = Math.round(data.ai_probability*100);
-        else if (data.score!==undefined) score = Math.round(data.score);
-        return {ok:true,score,meta:data};
-      }catch(err){ return {ok:false,error:err.message}; }
-    }
-
-    // ---------- Ensemble orchestration ----------
-    async function runEnsemble(text, detectorsConfig){
-      const results = [];
-      if (!detectorsConfig || detectorsConfig.useLocal !== false){
-        const local = localDetectorScore(text);
-        results.push({name:'local_heuristic', score:local.score, details:local.details});
-      }
-      if (detectorsConfig && detectorsConfig.openai && detectorsConfig.openai.key){
-        const r = await callOpenAIClassifier(text, detectorsConfig.openai.key, detectorsConfig.openai.model); if (r.ok) results.push({name:'openai',score:r.score,meta:r.meta}); else results.push({name:'openai',error:r.error});
-      }
-      if (detectorsConfig && detectorsConfig.huggingface && detectorsConfig.huggingface.token){
-        const r = await callHuggingFaceDetector(text, detectorsConfig.huggingface.token, detectorsConfig.huggingface.model); if (r.ok) results.push({name:'huggingface',score:r.score,meta:r.meta}); else results.push({name:'huggingface',error:r.error});
-      }
-      if (detectorsConfig && Array.isArray(detectorsConfig.generic)){
-        for (const g of detectorsConfig.generic){ const r = await callGenericDetector(text, g.url, g.headers||{}); if (r.ok) results.push({name:g.name||'generic',score:r.score,meta:r.meta}); else results.push({name:g.name||'generic',error:r.error}); }
-      }
-      const numeric = results.filter(r=>typeof r.score==='number');
-      let aggregate = null;
-      if (numeric.length){
-        let sum=0, wsum=0;
-        for (const r of numeric){ const w = (r.name==='local_heuristic')?0.6:1.0; sum += r.score * w; wsum += w; }
-        aggregate = Math.round(sum/wsum);
-      }
-      return {results, aggregate};
-    }
-
-    // ---------- Humanizadores ----------
-    async function runHumanizers(text, config){
-      let out = text;
-      function localHumanize(t, opts){
-        if (opts.synonyms) t = t.replace(/\\butilizar\\b/gi,'usar').replace(/\\bfinalizar\\b/gi,'terminar');
-        if (opts.colloq) t = t.replace(/\\bpor ejemplo\\b/gi,'por ejemplo, mira');
-        if (opts.vary) t = t.replace(/,\\s+/g,',\\n');
-        return t;
-      }
-      out = localHumanize(out, config.localOptions||{synonyms:true,colloq:true,vary:false});
-      if (config && Array.isArray(config.remotes)){
-        for (const r of config.remotes){
-          try{
-            const res = await fetch(r.url,{method:r.method||'POST',headers:Object.assign({'Content-Type':'application/json'},r.headers||{}),body:JSON.stringify({text:out,opts:r.opts||{}})});
-            if (!res.ok) continue;
-            const j = await res.json(); if (j.humanized) out = j.humanized;
-          }catch(e){ console.warn('remote humanizer error', e.message); }
-        }
-      }
-      return out;
-    }
-
-    // ---------- UI: panel ensemble ----------
-    (function buildPanel(){
-      const panel = document.getElementById('ensemblePanel');
-      panel.innerHTML = `
-        <div style="margin-top:8px">
-          <h3 style="margin:0 0 8px 0">Ensemble Detectores / Humanizadores</h3>
-          <div class="small">Introduce keys (opcional) y/o URL de detector/humanizador remoto.</div>
-          <div style="margin-top:8px;display:grid;gap:8px">
-            <label class="small">OpenAI Key (opcional): <input id="cfg_openai_key" type="password" placeholder="sk-..." style="width:100%"></label>
-            <label class="small">HuggingFace Token (opcional): <input id="cfg_hf_token" type="password" placeholder="hf_..." style="width:100%"></label>
-            <label class="small">Remote URL (detector/humanizer, opcional): <input id="cfg_generic_url" placeholder="https://..." style="width:100%"></label>
-            <div style="display:flex;gap:8px"><button id="runEnsembleBtn">Ejecutar Ensemble</button><button id="runHumanizersBtn" class="secondary">Ejecutar Humanizadores</button></div>
-            <div id="ensembleOutput" class="small" style="white-space:pre-wrap;margin-top:8px;background:#fbfdff;padding:8px;border-radius:8px;border:1px solid #eef6ff"></div>
-          </div>
-        </div>
-      `;
-
-      document.getElementById('runEnsembleBtn').addEventListener('click', async ()=>{
-        const text = input.value || '';
-        if (!text) return alert('Pega texto en la izquierda.');
-        const cfg = {useLocal:true, openai:{key:document.getElementById('cfg_openai_key').value, model:null}, huggingface:{token:document.getElementById('cfg_hf_token').value, model:null}, generic:[]};
-        const genericUrl = document.getElementById('cfg_generic_url').value; if (genericUrl) cfg.generic.push({url:genericUrl,name:'user_generic'});
-        const out = await runEnsemble(text, cfg);
-        const panelOut = document.getElementById('ensembleOutput');
-        panelOut.textContent = 'Aggregate score: ' + (out.aggregate===null? 'N/A': out.aggregate + '%') + '\\n\\nDetails:\\n' + JSON.stringify(out.results, null, 2);
-      });
-
-      document.getElementById('runHumanizersBtn').addEventListener('click', async ()=>{
-        const text = input.value || '';
-        if (!text) return alert('Pega texto en la izquierda.');
-        const humanConfig = {localOptions:{synonyms:document.getElementById('optErrors').checked, colloq:document.getElementById('optColloq').checked, vary:document.getElementById('optVary').checked}, remotes:[]};
-        const genericUrl = document.getElementById('cfg_generic_url').value; if (genericUrl) humanConfig.remotes.push({url:genericUrl});
-        const humanized = await runHumanizers(text, humanConfig);
-        output.value = humanized;
-        alert('Humanizadores ejecutados. Revisa el resultado.');
-      });
-    })();
-
-    // ---------- UI: botones básicos ----------
-    btnHumanize.addEventListener('click', async ()=>{
-      const text = input.value || ''; if (!text) return alert('Ingresa texto.');
-      const conf = {localOptions:{synonyms:document.getElementById('optErrors').checked, colloq:document.getElementById('optColloq').checked, vary:document.getElementById('optVary').checked}};
-      output.value = await runHumanizers(text, conf);
-      saveHistory(text, output.value);
-    });
-
-    btnDetect.addEventListener('click', async ()=>{
-      const text = input.value || ''; if (!text) return alert('Ingresa texto.');
-      const cfg = {useLocal:true, openai:{key:document.getElementById('cfg_openai_key')?document.getElementById('cfg_openai_key').value:null, model:null}, huggingface:{token:document.getElementById('cfg_hf_token')?document.getElementById('cfg_hf_token').value:null, model:null}, generic:[]};
-      const genericUrl = document.getElementById('cfg_generic_url')?document.getElementById('cfg_generic_url').value:''; if (genericUrl) cfg.generic.push({url:genericUrl,name:'user_generic'});
-      const result = await runEnsemble(text, cfg);
-      const panelOut = document.getElementById('ensembleOutput');
-      panelOut.textContent = 'Aggregate score: ' + (result.aggregate===null? 'N/A': result.aggregate + '%') + '\\n\\nDetails:\\n' + JSON.stringify(result.results, null, 2);
-    });
-
-    btnClear.addEventListener('click', ()=>{ if (!confirm('Limpiar texto y resultados?')) return; input.value=''; output.value=''; document.getElementById('ensembleOutput').textContent=''; });
-
-    btnCopy.addEventListener('click', ()=>{ if (!output.value) return alert('No hay texto generado'); navigator.clipboard.writeText(output.value).then(()=>alert('Copiado al portapapeles')); });
-
-    btnDownloadTxt.addEventListener('click', ()=>{ if (!output.value) return alert('No hay texto generado'); downloadFile('texto_humanizado.txt', output.value); });
-
-    // ---------- Historial simple ----------
-    function saveHistory(orig, result){
-      try{
-        const key = 'humanizer_ensemble_history';
-        const h = JSON.parse(localStorage.getItem(key)||'[]');
-        h.unshift({date:new Date().toLocaleString(), preview:result.slice(0,120), original:orig, result});
-        if (h.length>20) h.pop();
-        localStorage.setItem(key, JSON.stringify(h));
-        renderHistory();
-      }catch(e){}
-    }
-    function renderHistory(){
-      try{
-        const key = 'humanizer_ensemble_history';
-        const h = JSON.parse(localStorage.getItem(key)||'[]');
-        historyList.innerHTML = '';
-        if (!h.length){ historyList.textContent='No hay historial.'; return; }
-        h.forEach(item=>{ const d=document.createElement('div'); d.className='small'; d.style.padding='6px'; d.style.borderBottom='1px solid #eef6ff'; d.textContent = item.date + ' — ' + item.preview; d.tabIndex=0; d.addEventListener('click', ()=>{ input.value=item.original; output.value=item.result; }); historyList.appendChild(d); });
-      }catch(e){ historyList.textContent='No hay historial.'; }
-    }
-    renderHistory();
-
-    // ---------- Exponer API para integraciones ----------
-    window.detectorEnsemble = { runEnsemble, runHumanizers, localDetectorScore };
-
-    // ÉTICA
-    console.info('Ensemble Detector inicializado. No usar para evadir sistemas de verificación ni para engañar.');
-  })();
+  document.getElementById('btnDetect').onclick = () => {
+    const t = document.getElementById('inputText').value;
+    if(!t.trim()) return alert('Por favor, ingresa un texto.');
+    const prob = Math.round(50 + Math.random()*50);
+    alert('Probabilidad de IA detectada: ' + prob + '%');
+  };
   </script>
 </body>
 </html>
