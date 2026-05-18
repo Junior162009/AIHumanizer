@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Humanizador Anti‑IA · MindMath Edition</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+      background: radial-gradient(circle at 20% 30%, #ffecb3, #ffddee);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem 1rem;
+      color: #1a1a2e;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      border-radius: 2.5rem;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 1100px;
+      box-shadow: 0 25px 45px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.6);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -20%;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, #00bfff40, #ff6ec740);
+      border-radius: 50%;
+      z-index: 0;
+      filter: blur(40px);
+      opacity: 0.6;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+    }
+
+    h1 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #00bfff, #ff6ec7, #ffca3a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subhead {
+      text-align: center;
+      font-weight: 500;
+      margin-bottom: 1.8rem;
+      color: #4a4a6a;
+      font-size: 1.05rem;
+    }
+
+    .config-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 1.8rem;
+      margin-bottom: 1.8rem;
+      background: #f6f9ff;
+      padding: 1rem 2rem;
+      border-radius: 1.2rem;
+      border: 1px solid #d4e0ff;
+    }
+
+    .slider-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .slider-group label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #2b2d42;
+    }
+
+    input[type="range"] {
+      width: 120px;
+      accent-color: #ff6ec7;
+    }
+
+    .toggle-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toggle-group input[type="checkbox"] {
+      accent-color: #00bfff;
+      transform: scale(1.1);
+    }
+
+    .toggle-group label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #2b2d42;
+    }
+
+    .text-areas {
+      display: flex;
+      flex-direction: column;
+      gap: 1.3rem;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 160px;
+      padding: 1.2rem 1.4rem;
+      border-radius: 1.5rem;
+      border: 2px solid #e0d7ff;
+      font-size: 1rem;
+      line-height: 1.6;
+      resize: vertical;
+      background: #fdfbff;
+      transition: 0.25s ease;
+      font-family: inherit;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.03);
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #ff6ec7;
+      box-shadow: 0 0 0 4px rgba(255,110,199,0.15);
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.2rem 0;
+    }
+
+    button {
+      background: linear-gradient(135deg, #00bfff, #ff6ec7);
+      border: none;
+      padding: 0.8rem 2rem;
+      border-radius: 3rem;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    button:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 15px 25px rgba(255, 110, 199, 0.35);
+    }
+
+    button.secondary {
+      background: #f0f3ff;
+      color: #1e1e2f;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    button.secondary:hover {
+      background: #e4eaff;
+    }
+
+    .watermark {
+      position: absolute;
+      bottom: 15px;
+      right: 25px;
+      font-size: 0.8rem;
+      color: #1e3b8a;
+      opacity: 0.9;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.7);
+      padding: 0.3rem 1rem;
+      border-radius: 2rem;
+      backdrop-filter: blur(5px);
+      z-index: 5;
+    }
+
+    .watermark img {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 1.8rem 1.2rem;
+      }
+      .config-panel {
+        flex-direction: column;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="content">
+      <h1>
+        <span class="gradient-text">✨ Humanizador Anti‑IA ✨</span>
+        <span style="font-size:1.3rem;">— MindMath</span>
+      </h1>
+      <p class="subhead">
+        Convierte cualquier texto de IA en escritura natural, indetectable y con alma humana.
+      </p>
+
+      <!-- Panel de control de parámetros -->
+      <div class="config-panel">
+        <div class="slider-group">
+          <label for="intensity">🎚️ Intensidad</label>
+          <input type="range" id="intensity" min="1" max="10" value="7" step="1" />
+          <span id="intensityValue">7</span>
+        </div>
+        <div class="toggle-group">
+          <input type="checkbox" id="typosToggle" checked />
+          <label for="typosToggle">✍️ Errores tipográficos</label>
+        </div>
+        <div class="toggle-group">
+          <input type="checkbox" id="fillerToggle" checked />
+          <label for="fillerToggle">💬 Muletillas</label>
+        </div>
+        <div class="toggle-group">
+          <input type="checkbox" id="restructureToggle" checked />
+          <label for="restructureToggle">🔄 Reestructurar frases</label>
+        </div>
+      </div>
+
+      <!-- Áreas de texto -->
+      <div class="text-areas">
+        <textarea id="inputText" placeholder="Pega aquí el texto generado por IA..."></textarea>
+        <div class="btn-row">
+          <button id="btnHumanize"><span>🪄</span> Humanizar texto</button>
+          <button id="btnDetect" class="secondary"><span>🔍</span> Detectar IA</button>
+          <button id="btnCopy" class="secondary" title="Copiar resultado"><span>📋</span> Copiar</button>
+        </div>
+        <textarea id="outputText" placeholder="Tu texto humanizado aparecerá aquí..." readonly></textarea>
+      </div>
+
+      <!-- Marca de agua -->
+      <div class="watermark">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHAAAABwCAYAAABxAvmHAAAABHNCSVQICAgIfAhkiAAAAWlJREFUeJzt3TEOwiAQRdEw3P//JzsVqP1ScdQbO7nUlI80gCNlO3LD+g+2ghkE8T8Aw8U8AM/EMwDM9AMPFPAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPAzPFDMAzPBDPABx2ghVGpDnHAAAAAElFTkSuQmCC" alt="MindMath Logo" />
+        <span>Patrocinado por <strong>MindMath</strong> © MindMath</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- DICCIONARIOS Y HERRAMIENTAS ANTI-IA ----------
+      // Palabras formales -> informales / coloquiales
+      const formalToInformal = new Map([
+        ['utilizar', ['usar', 'emplear', 'echar mano de']],
+        ['finalizar', ['terminar', 'acabar', 'rematar']],
+        ['realizar', ['hacer', 'llevar a cabo', 'ejecutar']],
+        ['además', ['también', 'encima', 'por si fuera poco']],
+        ['sin embargo', ['pero', 'aunque', 'no obstante']],
+        ['por lo tanto', ['así que', 'entonces', 'por ende']],
+        ['debido a', ['por', 'gracias a', 'a causa de']],
+        ['obtener', ['conseguir', 'sacar', 'lograr']],
+        ['incrementar', ['aumentar', 'subir', 'crecer']],
+        ['disminuir', ['bajar', 'reducir', 'caer']],
+        ['aproximadamente', ['más o menos', 'unos', 'como']],
+        ['frecuentemente', ['a menudo', 'muchas veces', 'seguido']],
+        ['considerablemente', ['mucho', 'un montón', 'bastante']],
+        ['rápidamente', ['rápido', 'a toda leche', 'volando']],
+        ['necesitar', ['requerir', 'precisar', 'hacer falta']],
+        ['importante', ['clave', 'crucial', 'vital']],
+        ['ayudar', ['echar una mano', 'apoyar', 'colaborar']],
+        ['comprender', ['entender', 'pillar', 'captar']],
+        ['manifestar', ['decir', 'expresar', 'soltar']],
+        ['poseer', ['tener', 'contar con', 'disponer de']],
+        ['habitualmente', ['normalmente', 'por lo general', 'casi siempre']],
+        ['efectuar', ['hacer', 'realizar']],
+        ['consiguiente', ['por tanto', 'en consecuencia']],
+        ['no obstante', ['pero', 'aun así']],
+        ['pese a', ['a pesar de', 'aunque']],
+        ['con el fin de', ['para', 'con el objetivo de']]
+      ]);
+
+      // Muletillas y expresiones coloquiales (insertables)
+      const fillerWords = [
+        'o sea', 'bueno', 'pues', 'la verdad es que', 'en plan', 'digamos', 
+        'a ver', 'mira', 'total que', 'es decir', 'vamos', 'yo creo que',
+        'sinceramente', 'por así decirlo', 'en mi opinión', 'lo cierto es que',
+        'no sé', 'supongo', 'quizás', 'a lo mejor', 'la cosa es que'
+      ];
+
+      // Pequeños errores tipográficos realistas (omisión de tilde, cambio de letra)
+      const commonTypos = {
+        'á': ['a', 'á'],
+        'é': ['e', 'é'],
+        'í': ['i', 'í'],
+        'ó': ['o', 'ó'],
+        'ú': ['u', 'ú'],
+        'ü': ['u'],
+        'que': ['q', 'qe'],
+        'porque': ['xq', 'porq'],
+        'también': ['tambien', 'tmbn'],
+        'muy': ['mui'],
+        'sólo': ['solo'],
+        'está': ['esta'],
+      };
+
+      // Conectores para reestructurar
+      const sentenceStarters = [
+        'Es más,', 'De hecho,', 'Por cierto,', 'A propósito,', 'Ahora bien,',
+        'Dicho esto,', 'En realidad,', 'Como decía,', 'Por otra parte,'
+      ];
+
+      // ---------- FUNCIONES AUXILIARES ----------
+      function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+      }
+
+      function randomChoice(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+
+      // Probabilidad basada en intensidad (1-10)
+      function shouldApply(probabilityBase, intensity) {
+        // intensity mapea 1-10 a multiplicador de probabilidad 0.2-1.8
+        const factor = 0.3 + (intensity / 10) * 1.5;
+        return Math.random() < probabilityBase * factor;
+      }
+
+      // ---------- TRANSFORMACIONES ----------
+      
+      // 1. Reemplazo de palabras formales por informales
+      function replaceFormalWords(text, intensity) {
+        let result = text;
+        for (const [formal, alternatives] of formalToInformal.entries()) {
+          const regex = new RegExp(`\\b${formal}\\b`, 'gi');
+          if (regex.test(result) && shouldApply(0.65, intensity)) {
+            result = result.replace(regex, match => {
+              // mantiene mayúscula inicial si la tenía
+              const replacement = randomChoice(alternatives);
+              if (match[0] === match[0].toUpperCase()) {
+                return replacement.charAt(0).toUpperCase() + replacement.slice(1);
+              }
+              return replacement;
+            });
+          }
+        }
+        return result;
+      }
+
+      // 2. Insertar muletillas al inicio o en medio de oraciones
+      function insertFillers(text, intensity) {
+        if (!document.getElementById('fillerToggle').checked) return text;
+        const sentences = text.split(/(?<=[.?!])\s+/);
+        const newSentences = sentences.map(sentence => {
+          if (sentence.trim().length < 8) return sentence;
+          // Probabilidad de añadir muletilla al inicio
+          if (shouldApply(0.4, intensity) && !/^[A-Z]/.test(sentence)) {
+            sentence = randomChoice(fillerWords) + ', ' + sentence.charAt(0).toLowerCase() + sentence.slice(1);
+          }
+          // Insertar en medio (cada 10-20 palabras)
+          if (shouldApply(0.25, intensity)) {
+            const words = sentence.split(' ');
+            if (words.length > 6) {
+              const pos = randomInt(3, words.length - 3);
+              words.splice(pos, 0, randomChoice(fillerWords) + ',');
+              sentence = words.join(' ');
+            }
+          }
+          return sentence;
+        });
+        return newSentences.join(' ');
+      }
+
+      // 3. Simular errores tipográficos (tildes omitidas, letras cambiadas)
+      function addTypos(text, intensity) {
+        if (!document.getElementById('typosToggle').checked) return text;
+        let result = text;
+        // Recorrer caracteres y aplicar cambios con baja probabilidad
+        for (const [original, typoList] of Object.entries(commonTypos)) {
+          const regex = new RegExp(original, 'g');
+          result = result.replace(regex, match => {
+            if (shouldApply(0.15, intensity)) {
+              return randomChoice(typoList);
+            }
+            return match;
+          });
+        }
+        // Eliminar alguna tilde aleatoria
+        if (shouldApply(0.08, intensity)) {
+          result = result.replace(/[áéíóú]/g, match => {
+            return shouldApply(0.5, intensity) ? match.normalize('NFD').replace(/[\u0301]/g, '') : match;
+          });
+        }
+        return result;
+      }
+
+      // 4. Reestructurar oraciones: cambiar orden, dividir, unir
+      function restructureSentences(text, intensity) {
+        if (!document.getElementById('restructureToggle').checked) return text;
+        let sentences = text.split(/(?<=[.?!])\s+/);
+        if (sentences.length < 2) return text;
+        
+        const newSentences = [];
+        for (let i = 0; i < sentences.length; i++) {
+          let s = sentences[i];
+          // A veces empezar con un conector
+          if (shouldApply(0.3, intensity) && s.trim().length > 15) {
+            s = randomChoice(sentenceStarters) + ' ' + s.charAt(0).toLowerCase() + s.slice(1);
+          }
+          // Dividir oraciones largas
+          if (s.length > 100 && shouldApply(0.4, intensity)) {
+            const mid = Math.floor(s.length / 2);
+            const splitPoint = s.indexOf(',', mid - 15);
+            if (splitPoint > 20) {
+              const part1 = s.slice(0, splitPoint + 1).trim();
+              const part2 = s.slice(splitPoint + 1).trim();
+              newSentences.push(part1);
+              newSentences.push(part2.charAt(0).toUpperCase() + part2.slice(1));
+              continue;
+            }
+          }
+          // Unir oración corta con la siguiente
+          if (s.length < 40 && i + 1 < sentences.length && sentences[i+1].length < 60 && shouldApply(0.25, intensity)) {
+            s += ' y ' + sentences[i+1].charAt(0).toLowerCase() + sentences[i+1].slice(1);
+            i++; // saltar la siguiente
+          }
+          newSentences.push(s);
+        }
+        return newSentences.join(' ');
+      }
+
+      // 5. Cambiar puntuación: añadir exclamaciones, puntos suspensivos, etc.
+      function varyPunctuation(text, intensity) {
+        if (!shouldApply(0.5, intensity)) return text;
+        let result = text;
+        // Reemplazar algunos puntos por puntos suspensivos o exclamaciones
+        result = result.replace(/\./g, match => {
+          if (shouldApply(0.1, intensity)) return '...';
+          if (shouldApply(0.05, intensity)) return '!';
+          return match;
+        });
+        // Añadir coma antes de "pero", "aunque" si no la tiene
+        result = result.replace(/\s(pero|aunque)\s/g, (match) => {
+          if (shouldApply(0.6, intensity)) return ', ' + match.trim() + ' ';
+          return match;
+        });
+        return result;
+      }
+
+      // 6. Mezcla de mayúsculas/minúsculas (inicio de frase deliberadamente minúscula)
+      function messWithCapitalization(text, intensity) {
+        if (!shouldApply(0.2, intensity)) return text;
+        const sentences = text.split(/(?<=[.?!])\s+/);
+        return sentences.map(s => {
+          if (s.length > 10 && shouldApply(0.15, intensity)) {
+            return s.charAt(0).toLowerCase() + s.slice(1);
+          }
+          return s;
+        }).join(' ');
+      }
+
+      // 7. Añadir coletilla personal al final (opcional)
+      function addPersonalTouch(text, intensity) {
+        if (shouldApply(0.4, intensity)) {
+          const endings = [
+            ' ¿no crees?', ' En fin, cosas de la vida.', ' Eso pienso yo, vaya.',
+            ' Así lo veo.', ' Bueno, cada quien.', ' No sé tú, pero yo lo tengo claro.',
+            ' 🤷', ' 😅', ' ✌️'
+          ];
+          return text + randomChoice(endings);
+        }
+        return text;
+      }
+
+      // ---------- ORQUESTADOR DE HUMANIZACIÓN ----------
+      function humanizeText(text, intensity) {
+        if (!text.trim()) return '';
+        let result = text;
+        
+        // Aplicar capas en orden (algunas dependen del orden)
+        result = replaceFormalWords(result, intensity);
+        result = insertFillers(result, intensity);
+        result = restructureSentences(result, intensity);
+        result = addTypos(result, intensity);
+        result = varyPunctuation(result, intensity);
+        result = messWithCapitalization(result, intensity);
+        result = addPersonalTouch(result, intensity);
+        
+        // Limpieza final: espacios dobles, etc.
+        result = result.replace(/\s{2,}/g, ' ').trim();
+        return result;
+      }
+
+      // ---------- DETECTOR SIMULADO (con algo de lógica) ----------
+      function detectAIProbability(text) {
+        // Heurísticas simples para variar el resultado de forma más realista
+        if (!text.trim()) return 0;
+        let score = 0;
+        const lower = text.toLowerCase();
+        
+        // Palabras muy formales que suelen dejar rastro
+        const formalTraces = ['sin embargo', 'por lo tanto', 'debido a', 'aproximadamente', 'considerablemente'];
+        for (const trace of formalTraces) {
+          if (lower.includes(trace)) score += 5;
+        }
+        
+        // Repetición excesiva de palabras
+        const words = lower.split(/\W+/);
+        const wordFreq = {};
+        words.forEach(w => wordFreq[w] = (wordFreq[w] || 0) + 1);
+        const repetitive = Object.values(wordFreq).filter(c => c > 4).length;
+        score += repetitive * 3;
+        
+        // Longitud de oraciones muy uniforme
+        const sentences = text.split(/[.?!]+/).filter(s => s.trim().length > 5);
+        if (sentences.length > 2) {
+          const lengths = sentences.map(s => s.length);
+          const avg = lengths.reduce((a,b)=>a+b,0)/lengths.length;
+          const variance = lengths.reduce((a,b)=>a+(b-avg)**2,0)/lengths.length;
+          if (variance < 100) score += 10; // muy uniforme
+        }
+        
+        // Presencia de muletillas o errores resta probabilidad (humanizado)
+        const fillerCount = (lower.match(/\b(o sea|bueno|pues|digamos|la verdad es que)\b/g) || []).length;
+        score -= fillerCount * 4;
+        const typoIndicators = (lower.match(/[áéíóú] falta/g) || []).length;
+        score -= typoIndicators * 3;
+        
+        // Acotar entre 0 y 100
+        let probability = 40 + score;
+        probability = Math.min(98, Math.max(5, probability));
+        // Añadir un poco de ruido
+        probability += randomInt(-4, 4);
+        return Math.round(probability);
+      }
+
+      // ---------- INTERFAZ ----------
+      const inputEl = document.getElementById('inputText');
+      const outputEl = document.getElementById('outputText');
+      const intensitySlider = document.getElementById('intensity');
+      const intensityValue = document.getElementById('intensityValue');
+      
+      intensitySlider.addEventListener('input', (e) => {
+        intensityValue.textContent = e.target.value;
+      });
+
+      document.getElementById('btnHumanize').addEventListener('click', () => {
+        const text = inputEl.value;
+        if (!text.trim()) {
+          alert('Por favor, ingresa un texto para humanizar.');
+          return;
+        }
+        const intensity = parseInt(intensitySlider.value, 10);
+        const humanized = humanizeText(text, intensity);
+        outputEl.value = humanized;
+      });
+
+      document.getElementById('btnDetect').addEventListener('click', () => {
+        const text = inputEl.value;
+        if (!text.trim()) {
+          alert('Primero ingresa un texto.');
+          return;
+        }
+        const prob = detectAIProbability(text);
+        alert(`🔎 Probabilidad de ser IA: ${prob}%\n\n(Análisis basado en parámetros actuales anti-detección.)`);
+      });
+
+      document.getElementById('btnCopy').addEventListener('click', () => {
+        const output = outputEl.value;
+        if (!output.trim()) {
+          alert('No hay texto humanizado para copiar.');
+          return;
+        }
+        navigator.clipboard.writeText(output).then(() => {
+          alert('📋 ¡Texto copiado al portapapeles!');
+        }).catch(() => {
+          prompt('Copia manualmente:', output);
+        });
+      });
+
+      // Ejemplo de placeholder que se limpia al enfocar
+      inputEl.addEventListener('focus', function() {
+        if (this.value === '') this.placeholder = '';
+      });
+      inputEl.addEventListener('blur', function() {
+        if (this.value === '') this.placeholder = 'Pega aquí el texto generado por IA...';
+      });
+    })();
+  </script>
+</body>
+</html>
